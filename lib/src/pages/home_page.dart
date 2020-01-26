@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:rotary/src/dto/search_dto.dart';
+import 'package:rotary/src/models/ciudad.dart';
 import 'package:rotary/src/models/especialidad.dart';
-import 'package:rotary/src/models/socio.dart';
+import 'package:rotary/src/models/search.dart';
+import 'package:rotary/src/pages/info_page.dart';
+
+import 'package:rotary/src/providers/http/ciudad_provider.dart';
 import 'package:rotary/src/providers/http/especialidad_provider.dart';
-import 'package:rotary/src/providers/http/socio_provider.dart';
+import 'package:rotary/src/providers/http/search_provider.dart';
+
 import 'package:rotary/src/widget/drawer.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
@@ -16,23 +22,48 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // Input
   TextEditingController buscar = new TextEditingController();
-  TextEditingController especialidad = new TextEditingController();
+  String especialidad;
+  String ciudad;
 
   // Scroll
   ScrollController _scrollController = new ScrollController();
 
   // Providers
   EspecialidadProvider especialidadProvider = new EspecialidadProvider();
+  CiudadProvider ciudadProvider = new CiudadProvider();
+  SearchProvider searchProvider = new SearchProvider();
+
+  //Future
+  Future<List<Search>> searchs;
+
+  //Clases
+  SearchDto searchDto;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    especialidad = 'Todas';
+    ciudad = 'Todas';
+    searchDto = new SearchDto();
+    if (especialidad == 'Todas') {
+      searchDto.especialidad = null;
+    } else {
+      searchDto.especialidad = especialidad;
+    }
+    if (ciudad == 'Todas') {
+      searchDto.ciudad = null;
+    } else {
+      searchDto.ciudad = ciudad;
+    }
+    searchDto.descripcion = buscar.text;
+    searchs = searchProvider.getSociosSeach(searchDto);
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        _scrollController.animateTo(_scrollController.position.pixels + 100,
-            curve: Curves.fastOutSlowIn, duration: Duration(milliseconds: 250));
+        _scrollController.animateTo(_scrollController.position.pixels + 200,
+            curve: Curves.fastOutSlowIn,
+            duration: Duration(milliseconds: 2500));
       }
     });
   }
@@ -46,6 +77,40 @@ class _HomePageState extends State<HomePage> {
       ),
       appBar: AppBar(
         title: Text('Rotary'),
+        actions: <Widget>[
+          // IconButton(
+          //   icon: Icon(
+          //     Icons.menu,
+          //     color: Colors.white,
+          //   ),
+          //   onPressed: () {
+          //     _scaffoldKey.currentState.openDrawer();
+          //   },
+          // ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              setState(() {
+                buscar.clear();
+                especialidad = 'Todas';
+                ciudad = 'Todas';
+                searchDto = new SearchDto();
+                if (especialidad == 'Todas') {
+                  searchDto.especialidad = null;
+                } else {
+                  searchDto.especialidad = especialidad;
+                }
+                if (ciudad == 'Todas') {
+                  searchDto.ciudad = null;
+                } else {
+                  searchDto.ciudad = ciudad;
+                }
+                searchDto.descripcion = buscar.text;
+                searchs = searchProvider.getSociosSeach(searchDto);
+              });
+            },
+          ),
+        ],
       ),
       body: Container(
         child: Column(
@@ -70,7 +135,9 @@ class _HomePageState extends State<HomePage> {
                                   borderRadius: BorderRadius.circular(20.0)),
                               textColor: Colors.white,
                               child: Text('Buscar'),
-                              onPressed: () {},
+                              onPressed: () {
+                                _search();
+                              },
                             ))),
                       ],
                     ),
@@ -89,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                             child: _dropEspecialidad()),
                         Container(
                             width: (_screenSize.width / 2) - 25,
-                            child: _dropEspecialidad())
+                            child: _dropCiudadBySocio())
                       ],
                     ),
                   )
@@ -121,6 +188,44 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _dropCiudadBySocio() {
+    return FutureBuilder(
+        future: ciudadProvider.getCiudadBySocio(),
+        builder: (BuildContext context, AsyncSnapshot<List<Ciudad>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+
+          return new SearchableDropdown(
+            isExpanded: true,
+            items: snapshot.data.map((x) {
+              final nme = x.nombreCiudad.trim();
+              return new DropdownMenuItem(
+                child: Container(
+                  width: 155.0,
+                  child: new Text(
+                    nme,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+                value: x.nombreCiudad.trim(),
+              );
+            }).toList(),
+            value: ciudad,
+            hint: new Text('Ciudad'),
+            searchHint: new Text(
+              'Seleccione Una',
+              style: new TextStyle(fontSize: 20),
+            ),
+            onChanged: (value) {
+              setState(() {
+                ciudad = value;
+              });
+            },
+          );
+        });
+  }
+
   Widget _dropEspecialidad() {
     return FutureBuilder(
         future: especialidadProvider.getEspecialidades(),
@@ -145,6 +250,7 @@ class _HomePageState extends State<HomePage> {
                 value: x.nombreEspecialidad.trim(),
               );
             }).toList(),
+            value: especialidad,
             hint: new Text('Especialidad'),
             searchHint: new Text(
               'Seleccione Una',
@@ -152,7 +258,7 @@ class _HomePageState extends State<HomePage> {
             ),
             onChanged: (value) {
               setState(() {
-                especialidad.text = value;
+                especialidad = value;
               });
             },
           );
@@ -160,31 +266,42 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _getSocios() {
-    final socioProvider = new SocioProvider();
     return FutureBuilder(
-      future: socioProvider.getSocios(),
-      builder: (BuildContext context, AsyncSnapshot<List<Socio>> snapshot) {
+      future: searchs,
+      builder: (BuildContext context, AsyncSnapshot<List<Search>> snapshot) {
         if (snapshot.hasData) {
           return _listCardsSocios(snapshot.data);
         } else {
-          return Center(child: CircularProgressIndicator());
+          return Center(
+            child: Text(
+              'No Se Encontraron Socios',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          );
         }
       },
     );
   }
 
-  Widget _listCardsSocios(List<Socio> socios) {
+  Widget _listCardsSocios(List<Search> searchs) {
     return ListView.builder(
-        itemCount: socios.length,
+        itemCount: searchs.length,
         itemBuilder: (context, i) {
-          return _cardSocios(context, socios[i]);
+          return _cardSocios(context, searchs[i]);
         });
   }
 
-  Widget _cardSocios(BuildContext context, Socio socio) {
+  Widget _cardSocios(BuildContext context, Search search) {
+    print(search.celular);
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, 'info', arguments: {'opc': 02});
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InfoPage(
+           
+              ),
+            ));
       },
       child: Container(
         child: Column(
@@ -209,19 +326,21 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   // clipBehavior: Clip.antiAlias,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Container(
                         child: Column(
                           children: <Widget>[
                             Container(
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Container(
                                     width: 210,
-                                    margin:
-                                        EdgeInsets.symmetric(horizontal: 10),
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -229,20 +348,63 @@ class _HomePageState extends State<HomePage> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
+                                        SizedBox(
+                                          height: 2,
+                                        ),
                                         Text(
-                                          'Diseñador de Ropa de Modas',
+                                          '${search.especialidadEntity.nombreEspecialidad}',
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                           textAlign: TextAlign.start,
                                         ),
                                         SizedBox(
-                                          height: 10,
+                                          height: 5,
                                         ),
                                         Text(
-                                          'Diseñador de Ropa de Modas',
+                                          'Nombre: ${search.nombreCompleto}',
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 15,
+                                          ),
+                                          textAlign: TextAlign.start,
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          'Club: ${search.clubEntity.nombreClub}',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                          ),
+                                          textAlign: TextAlign.start,
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          'Ciudad: ${search.ciudadEntity.nombreCiudad}',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                          ),
+                                          textAlign: TextAlign.start,
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          'Direccion: ${search.informacionComercialEntity.direccionComercial}',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                          ),
+                                          textAlign: TextAlign.start,
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          'Telefono: ${search.informacionComercialEntity.telefono}',
+                                          style: TextStyle(
+                                            fontSize: 15,
                                           ),
                                           textAlign: TextAlign.start,
                                         )
@@ -292,8 +454,14 @@ class _HomePageState extends State<HomePage> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       onPressed: () {
-                                        Navigator.pushNamed(context, 'lote',
-                                            arguments: {'opc': 02});
+                                        print(search.celular);
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => InfoPage(
+                                                
+                                              ),
+                                            ));
                                       },
                                     ),
                                   )
@@ -313,5 +481,24 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  _search() {
+    searchDto = new SearchDto();
+    if (especialidad == 'Todas') {
+      searchDto.especialidad = null;
+    } else {
+      searchDto.especialidad = especialidad;
+    }
+    if (ciudad == 'Todas') {
+      searchDto.ciudad = null;
+    } else {
+      searchDto.ciudad = ciudad;
+    }
+    searchDto.descripcion = buscar.text;
+
+    setState(() {
+      searchs = searchProvider.getSociosSeach(searchDto);
+    });
   }
 }

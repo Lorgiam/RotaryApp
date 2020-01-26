@@ -1,32 +1,30 @@
+import 'package:rotary/src/dto/search_dto.dart';
+import 'package:rotary/src/models/search.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:rotary/src/models/especialidad.dart';
+
 import 'package:rotary/src/utils/constants.dart';
 
-class EspecialidadProvider {
-  EspecialidadProvider();
+class SearchProvider {
+  SearchProvider();
 
-  Future<List<Especialidad>> getEspecialidades() async {
+  Future<List<Search>> getSociosSeach(SearchDto searchDto) async {
     final Map<String, String> mapHeaders = {
       'Content-type': 'application/json',
       'Access-Control-Allow-Origin': '*',
     };
 
     return await http
-        .get('http://${Constants.URL_API}/especialidad/findEspecialidadBySocio',
-            headers: mapHeaders)
+        .post('http://${Constants.URL_API}/search/findSearch',
+            body: json.encode(searchDto.toJson()), headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
         String l = utf8.decode(jsonData.bodyBytes);
         Iterable le = json.decode(l);
         if (le.isNotEmpty) {
-          Especialidad especialidad = new Especialidad();
-          especialidad.nombreEspecialidad = 'Todas';
-          return List<Especialidad>.from(
-              le.map((x) => Especialidad.fromJson(x)))
-            ..insert(0, especialidad);
+          return List<Search>.from(le.map((x) => Search.fromJson(x)));
         } else {
-          return [];
+          return null;
         }
       } else {
         return null;
