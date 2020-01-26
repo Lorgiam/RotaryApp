@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:rotary/src/models/search.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InfoPage extends StatefulWidget {
-  InfoPage({Key key}) : super(key: key);
+  final Search search;
+  InfoPage({Key key, this.search}) : super(key: key);
 
   @override
   _InfoPageState createState() => _InfoPageState();
@@ -15,24 +18,47 @@ class _InfoPageState extends State<InfoPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
-          _crearAppbar(),
+          _crearAppbar(widget.search),
           SliverList(
             delegate: SliverChildListDelegate([
               SizedBox(height: 10.0),
-              _cardInfo(context),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'Información Basica',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.0),
+              _cardInfo(context, widget.search),
               SizedBox(
                 height: 10,
               ),
-              _cardInfoComer(context),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'Información Comercial',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ],
+              ),
               SizedBox(
                 height: 10,
               ),
-
-              // _descripcion(pelicula),
-              // _descripcion(pelicula),
-              // _descripcion(pelicula),
-              // _descripcion(pelicula),
-              // _crearCasting(pelicula)
+              _cardInfoComer(context, widget.search),
+              SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              _cardInfoComerDet(context, widget.search),
+              SizedBox(
+                height: 10,
+              ),
             ]),
           )
         ],
@@ -40,7 +66,7 @@ class _InfoPageState extends State<InfoPage> {
     );
   }
 
-  Widget _crearAppbar() {
+  Widget _crearAppbar(Search search) {
     return SliverAppBar(
       elevation: 2.0,
       backgroundColor: Colors.blue,
@@ -50,7 +76,7 @@ class _InfoPageState extends State<InfoPage> {
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
         title: Text(
-          'Hola Mundo',
+          '${search.especialidadEntity.nombreEspecialidad}',
           style: TextStyle(color: Colors.white, fontSize: 16.0),
         ),
         background: FadeInImage(
@@ -63,11 +89,9 @@ class _InfoPageState extends State<InfoPage> {
     );
   }
 
-  Widget _cardInfo(BuildContext context) {
+  Widget _cardInfo(BuildContext context, Search search) {
     return GestureDetector(
-        onTap: () {
-          Navigator.pushNamed(context, 'info', arguments: {'opc': 02});
-        },
+        onTap: () {},
         child: Container(
           width: _screenSize.width,
           margin: EdgeInsets.symmetric(horizontal: 10),
@@ -95,6 +119,77 @@ class _InfoPageState extends State<InfoPage> {
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        GestureDetector(
+                          onTap: () async {
+                            final url = 'tel:${search.celular}';
+                            if (await canLaunch(url)) {
+                              await launch(url);
+                            } else {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                          child: Container(
+                            // clipBehavior: Clip.antiAlias,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                          margin: EdgeInsets.only(top: 10),
+                                          child: Icon(
+                                            Icons.call,
+                                            color: Colors.blue,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 60,
+                                ),
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 1),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '${search.celular}',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            Text(
+                                              'Movil',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                         Container(
                           // clipBehavior: Clip.antiAlias,
                           child: Row(
@@ -109,7 +204,7 @@ class _InfoPageState extends State<InfoPage> {
                                     Container(
                                         margin: EdgeInsets.only(top: 10),
                                         child: Icon(
-                                          Icons.call,
+                                          Icons.person,
                                           color: Colors.blue,
                                         )),
                                   ],
@@ -123,6 +218,7 @@ class _InfoPageState extends State<InfoPage> {
                                   mainAxisSize: MainAxisSize.max,
                                   children: <Widget>[
                                     Container(
+                                      width: _screenSize.width * 0.6,
                                       margin:
                                           EdgeInsets.symmetric(vertical: 10),
                                       padding:
@@ -135,11 +231,11 @@ class _InfoPageState extends State<InfoPage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Text(
-                                            '+57 318-842-4892',
+                                            '${search.nombreCompleto}',
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           Text(
-                                            'Movil',
+                                            'Socio',
                                             style:
                                                 TextStyle(color: Colors.grey),
                                           ),
@@ -147,13 +243,16 @@ class _InfoPageState extends State<InfoPage> {
                                             height: 10,
                                           ),
                                           Text(
-                                            '+ 57 318-842-4892',
+                                            '${search.clubEntity.nombreClub}',
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           Text(
-                                            'Movil',
+                                            'Club',
                                             style:
                                                 TextStyle(color: Colors.grey),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
                                           ),
                                         ],
                                       ),
@@ -164,24 +263,290 @@ class _InfoPageState extends State<InfoPage> {
                             ],
                           ),
                         ),
+                        GestureDetector(
+                          onTap: () async {
+                            final url = 'mailto:${search.correoElectronico}';
+                            if (await canLaunch(url)) {
+                              await launch(url);
+                            } else {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                          child: Container(
+                            // clipBehavior: Clip.antiAlias,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Container(
+                                          margin: EdgeInsets.only(top: 10),
+                                          child: Icon(
+                                            Icons.mail,
+                                            color: Colors.blue,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 60,
+                                ),
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 1),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '${search.correoElectronico}',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            Text(
+                                              'Correo Electronico',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ));
+  }
+
+  Widget _cardInfoComer(BuildContext context, Search search) {
+    return GestureDetector(
+        onTap: () {},
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5.0),
+              color: Colors.white,
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 1.0,
+                    spreadRadius: 0.0,
+                    offset: Offset(0.0, 0.0))
+              ]),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: Container(
+              margin: EdgeInsets.only(left: 25),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: () async {
+                            if (search
+                                .informacionComercialEntity.direccionComercial
+                                .contains('#')) {
+                              var splitDir = search
+                                  .informacionComercialEntity.direccionComercial
+                                  .split('#');
+                              final url =
+                                  'https://maps.google.com/?q=${splitDir[0]} ${splitDir[1]} ${search.ciudadEntity.nombreCiudad}';
+                              if (await canLaunch(url)) {
+                                await launch(url);
+                              } else {
+                                throw 'Could not launch $url';
+                              }
+                            } else {
+                              final url =
+                                  'https://maps.google.com/?q=${search.informacionComercialEntity.direccionComercial} ${search.ciudadEntity.nombreCiudad}';
+                              if (await canLaunch(url)) {
+                                await launch(url);
+                              } else {
+                                throw 'Could not launch $url';
+                              }
+                            }
+                          },
+                          child: Container(
+                            // clipBehavior: Clip.antiAlias,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                          margin: EdgeInsets.only(top: 10),
+                                          child: Icon(
+                                            Icons.room,
+                                            color: Colors.blue,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 60,
+                                ),
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 1),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '${search.informacionComercialEntity.direccionComercial}',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            Text(
+                                              'Dirección Comercial',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            final url =
+                                'tel:${search.informacionComercialEntity.telefono}';
+                            if (await canLaunch(url)) {
+                              await launch(url);
+                            } else {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                          child: Container(
+                            // clipBehavior: Clip.antiAlias,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                          margin: EdgeInsets.only(top: 10),
+                                          child: Icon(
+                                            Icons.call,
+                                            color: Colors.blue,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 60,
+                                ),
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 10),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 1),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '${search.informacionComercialEntity.telefono}',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            Text(
+                                              'Telefono Comercial',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                         Container(
                           // clipBehavior: Clip.antiAlias,
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Container(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
                                     Container(
                                         margin: EdgeInsets.only(top: 10),
                                         child: Icon(
-                                          Icons.mail,
+                                          Icons.store,
                                           color: Colors.blue,
                                         )),
                                   ],
@@ -195,6 +560,7 @@ class _InfoPageState extends State<InfoPage> {
                                   mainAxisSize: MainAxisSize.max,
                                   children: <Widget>[
                                     Container(
+                                      width: _screenSize.width * 0.6,
                                       margin:
                                           EdgeInsets.symmetric(vertical: 10),
                                       padding:
@@ -207,13 +573,40 @@ class _InfoPageState extends State<InfoPage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Text(
-                                            'lorgiam1026@gmail.com',
+                                            '${search.informacionComercialEntity.nombreComercial}',
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           Text(
-                                            'Correo Electronico',
+                                            'Nombre Comercial',
                                             style:
                                                 TextStyle(color: Colors.grey),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            '${search.ciudadEntity.nombreCiudad}',
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          Text(
+                                            'Ciudad',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            '${search.informacionComercialEntity.paginaEmail}',
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          Text(
+                                            'Pagina/Correo',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
                                           ),
                                         ],
                                       ),
@@ -234,11 +627,9 @@ class _InfoPageState extends State<InfoPage> {
         ));
   }
 
-  Widget _cardInfoComer(BuildContext context) {
+  Widget _cardInfoComerDet(BuildContext context, Search search) {
     return GestureDetector(
-        onTap: () {
-          Navigator.pushNamed(context, 'info', arguments: {'opc': 02});
-        },
+        onTap: () {},
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
@@ -279,7 +670,7 @@ class _InfoPageState extends State<InfoPage> {
                                     Container(
                                         margin: EdgeInsets.only(top: 10),
                                         child: Icon(
-                                          Icons.room,
+                                          Icons.message,
                                           color: Colors.blue,
                                         )),
                                   ],
@@ -293,6 +684,7 @@ class _InfoPageState extends State<InfoPage> {
                                   mainAxisSize: MainAxisSize.max,
                                   children: <Widget>[
                                     Container(
+                                      width: _screenSize.width * 0.6,
                                       margin:
                                           EdgeInsets.symmetric(vertical: 10),
                                       padding:
@@ -305,11 +697,11 @@ class _InfoPageState extends State<InfoPage> {
                                             MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Text(
-                                            'Calle 10 # 28c-45',
+                                            '${search.informacionComercialEntity.descripcionServicio}',
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           Text(
-                                            'Dirección',
+                                            'Descripcion del Servicio',
                                             style:
                                                 TextStyle(color: Colors.grey),
                                           ),

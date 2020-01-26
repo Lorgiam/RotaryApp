@@ -299,7 +299,7 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
               builder: (context) => InfoPage(
-           
+                search: search,
               ),
             ));
       },
@@ -459,7 +459,7 @@ class _HomePageState extends State<HomePage> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) => InfoPage(
-                                                
+                                                search: search,
                                               ),
                                             ));
                                       },
