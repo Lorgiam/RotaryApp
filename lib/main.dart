@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:rotary/bloc/provider.dart';
 import 'package:rotary/src/routes/routes.dart';
 
@@ -18,6 +19,14 @@ class MyApp extends StatelessWidget {
           }
         },
         child: MaterialApp(
+          localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('es', 'ES'), // Spanish
+          // ...
+        ],
           title: 'Rotary',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

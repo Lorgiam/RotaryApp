@@ -50,9 +50,9 @@ class LoginPage extends StatelessWidget {
             ),
           ),
           FlatButton(
-            child: Text('Crear una nueva cuenta'),
+            child: Text('Crear cuenta'),
             onPressed: () =>
-                Navigator.pushReplacementNamed(context, 'registro'),
+                Navigator.pushNamed(context, 'register'),
           ),
           SizedBox(height: 100.0)
         ],
