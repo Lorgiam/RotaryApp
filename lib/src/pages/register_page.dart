@@ -4,6 +4,13 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rotary/src/models/ciudad.dart';
+import 'package:rotary/src/models/club.dart';
+import 'package:rotary/src/models/especialidad.dart';
+import 'package:rotary/src/providers/http/ciudad_provider.dart';
+import 'package:rotary/src/providers/http/club_provider.dart';
+import 'package:rotary/src/providers/http/especialidad_provider.dart';
+import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
@@ -13,13 +20,26 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  //Providers
+  ClubProvider clubProvider = new ClubProvider();
+  EspecialidadProvider especialidadProvider = new EspecialidadProvider();
   // Input
   TextEditingController nombreCompleto = new TextEditingController();
   TextEditingController numeroCedula = new TextEditingController();
   TextEditingController correoElectronico = new TextEditingController();
   TextEditingController numeroCelular = new TextEditingController();
+  TextEditingController nombreComercial = new TextEditingController();
+  TextEditingController direccionComercial = new TextEditingController();
+  TextEditingController paginacorreo = new TextEditingController();
+  TextEditingController telefono = new TextEditingController();
+  TextEditingController descripcion = new TextEditingController();
+  CiudadProvider ciudadProvider = new CiudadProvider();
+
   TextEditingController _date = new TextEditingController();
   String _fecha = '';
+  String club;
+  String especialidad;
+  String ciudad;
   // Variable de Ancho de la Pantalla
   var _screenSize;
   // Variable File para Visualizacion de la Imagen Tomada o Seleccionada
@@ -54,6 +74,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 width: 150,
                 height: 150,
                 child: _mostrarFoto(),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Información Basica',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -113,6 +140,91 @@ class _RegisterPageState extends State<RegisterPage> {
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 width: _screenSize.width * 0.9,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        child: _dropClubes(),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        child: _dropEspecialidad(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Información Comercial',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _fieldNombreComercial(),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _fieldDireccionComercial(),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        child: _dropCiudades(),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        child: _fieldNumeroComercial(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _fieldCorreoElectronicoComercial(),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
                   children: <Widget>[
                     Expanded(
                       child: MultiSelect(
@@ -154,6 +266,17 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
               ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: descripcionServicio(),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -172,6 +295,51 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Widget _fieldNombreComercial() {
+    return TextFormField(
+      enabled: true,
+      controller: nombreComercial,
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(labelText: 'Nombre Comercial'),
+      onSaved: (value) => nombreComercial.text = value,
+    );
+  }
+
+  Widget descripcionServicio() {
+    return TextFormField(
+      enabled: true,
+      maxLines: 3,
+      controller: descripcion,
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(labelText: 'Descripcion del Servicio'),
+      onSaved: (value) => descripcion.text = value,
+    );
+  }
+
+  Widget _fieldDireccionComercial() {
+    return TextFormField(
+      enabled: true,
+      controller: direccionComercial,
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(labelText: 'Dirección Comercial'),
+      onSaved: (value) => direccionComercial.text = value,
+    );
+  }
+
+  Widget _fieldNumeroComercial() {
+    return TextFormField(
+      enabled: true,
+      controller: telefono,
+      keyboardType: TextInputType.number,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(labelText: 'Telefono Comercial'),
+      onSaved: (value) => telefono.text = value,
+    );
+  }
+
   Widget _fieldNumeroCedula() {
     return TextFormField(
       enabled: true,
@@ -181,6 +349,121 @@ class _RegisterPageState extends State<RegisterPage> {
       decoration: InputDecoration(labelText: 'Numero de Cedula'),
       onSaved: (value) => numeroCedula.text = value,
     );
+  }
+
+  Widget _dropCiudades() {
+    return FutureBuilder(
+        future: ciudadProvider.getCiudades(),
+        builder: (BuildContext context, AsyncSnapshot<List<Ciudad>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+
+          return new SearchableDropdown(
+            isExpanded: true,
+            items: snapshot.data.map((x) {
+              final nme = x.nombreCiudad.trim();
+              return new DropdownMenuItem(
+                child: Container(
+                  width: 155.0,
+                  child: new Text(
+                    nme,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+                value: x.nombreCiudad.trim(),
+              );
+            }).toList(),
+            value: ciudad,
+            hint: new Text('Ciudad'),
+            searchHint: new Text(
+              'Seleccione Una',
+              style: new TextStyle(fontSize: 20),
+            ),
+            onChanged: (value) {
+              setState(() {
+                ciudad = value;
+              });
+            },
+          );
+        });
+  }
+
+  Widget _dropEspecialidad() {
+    return FutureBuilder(
+        future: especialidadProvider.getEspecialidades(),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<Especialidad>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+
+          return new SearchableDropdown(
+            isExpanded: true,
+            items: snapshot.data.map((x) {
+              final nme = x.nombreEspecialidad.trim();
+              return new DropdownMenuItem(
+                child: Container(
+                  width: 155.0,
+                  child: new Text(
+                    nme,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+                value: x.nombreEspecialidad.trim(),
+              );
+            }).toList(),
+            value: especialidad,
+            hint: new Text('Especialidad'),
+            searchHint: new Text(
+              'Seleccione Una',
+              style: new TextStyle(fontSize: 20),
+            ),
+            onChanged: (value) {
+              setState(() {
+                especialidad = value;
+              });
+            },
+          );
+        });
+  }
+
+  Widget _dropClubes() {
+    return FutureBuilder(
+        future: clubProvider.getClubes(),
+        builder: (BuildContext context, AsyncSnapshot<List<Club>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+
+          return new SearchableDropdown(
+            isExpanded: true,
+            items: snapshot.data.map((x) {
+              final nme = x.nombreClub.trim();
+              return new DropdownMenuItem(
+                child: Container(
+                  width: 155.0,
+                  child: new Text(
+                    nme,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+                value: x.nombreClub.trim(),
+              );
+            }).toList(),
+            value: club,
+            hint: new Text('Club'),
+            searchHint: new Text(
+              'Seleccione Una',
+              style: new TextStyle(fontSize: 20),
+            ),
+            onChanged: (value) {
+              setState(() {
+                club = value;
+              });
+            },
+          );
+        });
   }
 
   Widget _fieldNumeroCelular() {
@@ -200,8 +483,19 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: correoElectronico,
       keyboardType: TextInputType.emailAddress,
       textCapitalization: TextCapitalization.sentences,
-      decoration: InputDecoration(labelText: 'Correo Electronico'),
+      decoration: InputDecoration(labelText: 'Email'),
       onSaved: (value) => correoElectronico.text = value,
+    );
+  }
+
+  Widget _fieldCorreoElectronicoComercial() {
+    return TextFormField(
+      enabled: true,
+      controller: paginacorreo,
+      keyboardType: TextInputType.emailAddress,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(labelText: 'Pagina Web / Email Comercial'),
+      onSaved: (value) => paginacorreo.text = value,
     );
   }
 
@@ -236,12 +530,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
   _mostrarFoto() {
     //TODO: tengo que hacer este metodo para el perfil
-
-    return Image(
-        image: AssetImage(foto?.path ?? 'assets/img/no-image.png'),
-        width: 200,
-        height: 200,
-        fit: BoxFit.cover);
+    if (foto == null) {
+      return Image(
+          image: AssetImage('assets/img/no-image.png'),
+          width: 200,
+          height: 200,
+          fit: BoxFit.cover);
+    } else {
+      return Image.file(foto, width: 200, height: 200, fit: BoxFit.cover);
+    }
   }
 
   _seleccionarImagen(BuildContext context) async {
@@ -252,8 +549,8 @@ class _RegisterPageState extends State<RegisterPage> {
     _procesarImagen(ImageSource.camera);
   }
 
-  _procesarImagen(ImageSource source) {
-    foto = await ImagePicker.pickImage(source: ImageSource.camera);
+  _procesarImagen(ImageSource source) async {
+    foto = await ImagePicker.pickImage(source: source);
     if (foto != null) {
       //limpieza
     }
