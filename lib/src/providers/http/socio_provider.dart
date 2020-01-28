@@ -31,4 +31,30 @@ class SocioProvider {
       print(err);
     });
   }
+
+  Future<Socio> save(Socio scs) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+    return await http
+        .post('http://${Constants.URL_API}/socio/save',
+            headers: mapHeaders, body: json.encode(scs.toJson()))
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        String l = utf8.decode(jsonData.bodyBytes);
+        Iterable le = json.decode(l);
+        if (le.isNotEmpty) {
+          final Socio sc = Socio.fromJson(le.first);
+          return sc;
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
 }

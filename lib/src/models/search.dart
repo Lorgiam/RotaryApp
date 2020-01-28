@@ -18,10 +18,12 @@ class Search {
     int informacionComercial;
     int club;
     int especialidad;
+    int usuario;
     InformacionComercialEntity informacionComercialEntity;
     CiudadEntity ciudadEntity;
     ClubEntity clubEntity;
     EspecialidadEntity especialidadEntity;
+    UsuarioEntity usuarioEntity;
 
     Search({
         this.id,
@@ -33,10 +35,12 @@ class Search {
         this.informacionComercial,
         this.club,
         this.especialidad,
+        this.usuario,
         this.informacionComercialEntity,
         this.ciudadEntity,
         this.clubEntity,
         this.especialidadEntity,
+        this.usuarioEntity,
     });
 
     Search copyWith({
@@ -49,10 +53,12 @@ class Search {
         int informacionComercial,
         int club,
         int especialidad,
+        int usuario,
         InformacionComercialEntity informacionComercialEntity,
         CiudadEntity ciudadEntity,
         ClubEntity clubEntity,
         EspecialidadEntity especialidadEntity,
+        UsuarioEntity usuarioEntity,
     }) => 
         Search(
             id: id ?? this.id,
@@ -64,10 +70,12 @@ class Search {
             informacionComercial: informacionComercial ?? this.informacionComercial,
             club: club ?? this.club,
             especialidad: especialidad ?? this.especialidad,
+            usuario: usuario ?? this.usuario,
             informacionComercialEntity: informacionComercialEntity ?? this.informacionComercialEntity,
             ciudadEntity: ciudadEntity ?? this.ciudadEntity,
             clubEntity: clubEntity ?? this.clubEntity,
             especialidadEntity: especialidadEntity ?? this.especialidadEntity,
+            usuarioEntity: usuarioEntity ?? this.usuarioEntity,
         );
 
     factory Search.fromJson(Map<String, dynamic> json) => Search(
@@ -80,10 +88,12 @@ class Search {
         informacionComercial: json["informacionComercial"] == null ? null : json["informacionComercial"],
         club: json["club"] == null ? null : json["club"],
         especialidad: json["especialidad"] == null ? null : json["especialidad"],
+        usuario: json["usuario"] == null ? null : json["usuario"],
         informacionComercialEntity: json["informacionComercialEntity"] == null ? null : InformacionComercialEntity.fromJson(json["informacionComercialEntity"]),
         ciudadEntity: json["ciudadEntity"] == null ? null : CiudadEntity.fromJson(json["ciudadEntity"]),
         clubEntity: json["clubEntity"] == null ? null : ClubEntity.fromJson(json["clubEntity"]),
         especialidadEntity: json["especialidadEntity"] == null ? null : EspecialidadEntity.fromJson(json["especialidadEntity"]),
+        usuarioEntity: json["usuarioEntity"] == null ? null : UsuarioEntity.fromJson(json["usuarioEntity"]),
     );
 
     Map<String, dynamic> toJson() => {
@@ -96,10 +106,12 @@ class Search {
         "informacionComercial": informacionComercial == null ? null : informacionComercial,
         "club": club == null ? null : club,
         "especialidad": especialidad == null ? null : especialidad,
+        "usuario": usuario == null ? null : usuario,
         "informacionComercialEntity": informacionComercialEntity == null ? null : informacionComercialEntity.toJson(),
         "ciudadEntity": ciudadEntity == null ? null : ciudadEntity.toJson(),
         "clubEntity": clubEntity == null ? null : clubEntity.toJson(),
         "especialidadEntity": especialidadEntity == null ? null : especialidadEntity.toJson(),
+        "usuarioEntity": usuarioEntity == null ? null : usuarioEntity.toJson(),
     };
 }
 
@@ -264,5 +276,52 @@ class InformacionComercialEntity {
         "paginaEmail": paginaEmail == null ? null : paginaEmail,
         "ofrecer": ofrecer == null ? null : ofrecer,
         "ciudad": ciudad == null ? null : ciudad,
+    };
+}
+
+class UsuarioEntity {
+    int idUsuario;
+    dynamic contrasenia;
+    String tipo;
+    int estado;
+    String nombreUsuario;
+
+    UsuarioEntity({
+        this.idUsuario,
+        this.contrasenia,
+        this.tipo,
+        this.estado,
+        this.nombreUsuario,
+    });
+
+    UsuarioEntity copyWith({
+        int idUsuario,
+        dynamic contrasenia,
+        String tipo,
+        int estado,
+        String nombreUsuario,
+    }) => 
+        UsuarioEntity(
+            idUsuario: idUsuario ?? this.idUsuario,
+            contrasenia: contrasenia ?? this.contrasenia,
+            tipo: tipo ?? this.tipo,
+            estado: estado ?? this.estado,
+            nombreUsuario: nombreUsuario ?? this.nombreUsuario,
+        );
+
+    factory UsuarioEntity.fromJson(Map<String, dynamic> json) => UsuarioEntity(
+        idUsuario: json["id_usuario"] == null ? null : json["id_usuario"],
+        contrasenia: json["contrasenia"],
+        tipo: json["tipo"] == null ? null : json["tipo"],
+        estado: json["estado"] == null ? null : json["estado"],
+        nombreUsuario: json["nombreUsuario"] == null ? null : json["nombreUsuario"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id_usuario": idUsuario == null ? null : idUsuario,
+        "contrasenia": contrasenia,
+        "tipo": tipo == null ? null : tipo,
+        "estado": estado == null ? null : estado,
+        "nombreUsuario": nombreUsuario == null ? null : nombreUsuario,
     };
 }
