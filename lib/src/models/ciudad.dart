@@ -1,44 +1,44 @@
+// To parse this JSON data, do
+//
+//     final ciudad = ciudadFromJson(jsonString);
+
 import 'dart:convert';
 
-List<Ciudad> ciudadFromJson(String str) =>
-    List<Ciudad>.from(json.decode(str).map((x) => Ciudad.fromJson(x)));
+List<Ciudad> ciudadFromJson(String str) => List<Ciudad>.from(json.decode(str).map((x) => Ciudad.fromJson(x)));
 
-String ciudadToJson(List<Ciudad> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String ciudadToJson(List<Ciudad> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Ciudad {
-  int id;
-  String nombreCiudad;
-  int idDepartamento;
+    int idCiudad;
+    String nombreCiudad;
+    int idDepartamento;
 
-  Ciudad({
-    this.id,
-    this.nombreCiudad,
-    this.idDepartamento,
-  });
+    Ciudad({
+        this.idCiudad,
+        this.nombreCiudad,
+        this.idDepartamento,
+    });
 
-  Ciudad copyWith({
-    int id,
-    String nombreCiudad,
-    int idDepartamento,
-  }) =>
-      Ciudad(
-        id: id ?? this.id,
-        nombreCiudad: nombreCiudad ?? this.nombreCiudad,
-        idDepartamento: idDepartamento ?? this.idDepartamento,
-      );
+    Ciudad copyWith({
+        int idCiudad,
+        String nombreCiudad,
+        int idDepartamento,
+    }) => 
+        Ciudad(
+            idCiudad: idCiudad ?? this.idCiudad,
+            nombreCiudad: nombreCiudad ?? this.nombreCiudad,
+            idDepartamento: idDepartamento ?? this.idDepartamento,
+        );
 
-  factory Ciudad.fromJson(Map<String, dynamic> json) => Ciudad(
-        id: json["id"] == null ? null : json["id"],
-        nombreCiudad:
-            json["nombreCiudad"] == null ? null : json["nombreCiudad"],
-        idDepartamento:
-            json["idDepartamento"] == null ? null : json["idDepartamento"],
-      );
+    factory Ciudad.fromJson(Map<String, dynamic> json) => Ciudad(
+        idCiudad: json["idCiudad"] == null ? null : json["idCiudad"],
+        nombreCiudad: json["nombreCiudad"] == null ? null : json["nombreCiudad"],
+        idDepartamento: json["idDepartamento"] == null ? null : json["idDepartamento"],
+    );
 
-  Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
+    Map<String, dynamic> toJson() => {
+        "idCiudad": idCiudad == null ? null : idCiudad,
         "nombreCiudad": nombreCiudad == null ? null : nombreCiudad,
         "idDepartamento": idDepartamento == null ? null : idDepartamento,
-      };
+    };
 }

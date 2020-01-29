@@ -17,11 +17,9 @@ class InformacionComercialProvider {
             headers: mapHeaders, body: json.encode(infoco.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
-        String l = utf8.decode(jsonData.bodyBytes);
-        Iterable le = json.decode(l);
-        if (le.isNotEmpty) {
-          final InformacionComercial info =
-              InformacionComercial.fromJson(le.first);
+        final data = json.decode(jsonData.body);
+        if (data.isNotEmpty) {
+          final InformacionComercial info = InformacionComercial.fromJson(data);
           return info;
         } else {
           return null;

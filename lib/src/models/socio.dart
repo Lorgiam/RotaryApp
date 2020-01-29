@@ -4,9 +4,9 @@
 
 import 'dart:convert';
 
-Socio socioFromJson(String str) => Socio.fromJson(json.decode(str));
+List<Socio> socioFromJson(String str) => List<Socio>.from(json.decode(str).map((x) => Socio.fromJson(x)));
 
-String socioToJson(Socio data) => json.encode(data.toJson());
+String socioToJson(List<Socio> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Socio {
     int id;
@@ -18,6 +18,7 @@ class Socio {
     int informacionComercial;
     int club;
     int especialidad;
+    int usuario;
 
     Socio({
         this.id,
@@ -29,6 +30,7 @@ class Socio {
         this.informacionComercial,
         this.club,
         this.especialidad,
+        this.usuario,
     });
 
     Socio copyWith({
@@ -41,6 +43,7 @@ class Socio {
         int informacionComercial,
         int club,
         int especialidad,
+        int usuario,
     }) => 
         Socio(
             id: id ?? this.id,
@@ -52,6 +55,7 @@ class Socio {
             informacionComercial: informacionComercial ?? this.informacionComercial,
             club: club ?? this.club,
             especialidad: especialidad ?? this.especialidad,
+            usuario: usuario ?? this.usuario,
         );
 
     factory Socio.fromJson(Map<String, dynamic> json) => Socio(
@@ -64,6 +68,7 @@ class Socio {
         informacionComercial: json["informacionComercial"] == null ? null : json["informacionComercial"],
         club: json["club"] == null ? null : json["club"],
         especialidad: json["especialidad"] == null ? null : json["especialidad"],
+        usuario: json["usuario"] == null ? null : json["usuario"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -76,5 +81,6 @@ class Socio {
         "informacionComercial": informacionComercial == null ? null : informacionComercial,
         "club": club == null ? null : club,
         "especialidad": especialidad == null ? null : especialidad,
+        "usuario": usuario == null ? null : usuario,
     };
 }

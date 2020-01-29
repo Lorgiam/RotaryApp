@@ -32,6 +32,30 @@ class SocioProvider {
     });
   }
 
+  Future<List<Socio>> getSociosInactivos() async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+
+    return await http
+        .get('http://${Constants.URL_API}/socio/findSociosByEstadoInactivo', headers: mapHeaders)
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        Iterable l = json.decode(jsonData.body);
+        if (l.isNotEmpty) {
+          return List<Socio>.from(l.map((x) => Socio.fromJson(x)));
+        } else {
+          return [];
+        }
+      } else {
+        return null;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
   Future<Socio> save(Socio scs) async {
     final Map<String, String> mapHeaders = {
       'Content-type': 'application/json',
@@ -42,10 +66,9 @@ class SocioProvider {
             headers: mapHeaders, body: json.encode(scs.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
-        String l = utf8.decode(jsonData.bodyBytes);
-        Iterable le = json.decode(l);
-        if (le.isNotEmpty) {
-          final Socio sc = Socio.fromJson(le.first);
+        final data = json.decode(jsonData.body);
+        if (data.isNotEmpty) {
+          final Socio sc = Socio.fromJson(data);
           return sc;
         } else {
           return null;

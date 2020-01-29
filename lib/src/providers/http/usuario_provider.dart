@@ -17,10 +17,37 @@ class UsuarioProvider {
             headers: mapHeaders, body: json.encode(usu.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
-        String l = utf8.decode(jsonData.bodyBytes);
-        Iterable le = json.decode(l);
-        if (le.isNotEmpty) {
-          final Usuario us = Usuario.fromJson(le.first);
+        final data = json.decode(jsonData.body);
+        if (data.isNotEmpty) {
+          final Usuario us = Usuario.fromJson(data);
+          return us;
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
+  Future<Usuario> updateEstado(int id, int estado) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+    print('http://${Constants.URL_API}/usuario/updateEstado/$id/$estado');
+    return await http
+        .get(
+      'http://${Constants.URL_API}/usuario/updateEstado/$id/$estado',
+      headers: mapHeaders
+    )
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        final data = json.decode(jsonData.body);
+        if (data.isNotEmpty) {
+          final Usuario us = Usuario.fromJson(data);
           return us;
         } else {
           return null;

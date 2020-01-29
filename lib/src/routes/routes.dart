@@ -3,6 +3,7 @@ import 'package:rotary/src/pages/Info_page.dart';
 import 'package:rotary/src/pages/home_page.dart';
 import 'package:rotary/src/pages/login_page.dart';
 import 'package:rotary/src/pages/register_page.dart';
+import 'package:rotary/src/pages/valid_page.dart';
 
 Map<String, WidgetBuilder> getApplicationRoutes() {
   return <String, WidgetBuilder>{
@@ -10,5 +11,6 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     'home': (BuildContext context) => HomePage(),
     'info': (BuildContext context) => InfoPage(),
     'register': (BuildContext context) => RegisterPage(),
+    'valid': (BuildContext context) => ValidPage(),
   };
 }

@@ -51,8 +51,7 @@ class LoginPage extends StatelessWidget {
           ),
           FlatButton(
             child: Text('Crear cuenta'),
-            onPressed: () =>
-                Navigator.pushNamed(context, 'register'),
+            onPressed: () => Navigator.pushNamed(context, 'register'),
           ),
           SizedBox(height: 100.0)
         ],
@@ -70,8 +69,8 @@ class LoginPage extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
                 icon: Icon(Icons.portrait, color: Colors.blue),
-                hintText: '1116273460',
-                labelText: 'Cedula de Ciudadania',
+                hintText: '',
+                labelText: 'Usuario',
                 errorText: snapshot.error),
             onChanged: bloc.changeEmail,
           ),
@@ -164,7 +163,20 @@ class LoginPage extends StatelessWidget {
           padding: EdgeInsets.only(top: 80.0),
           child: Column(
             children: <Widget>[
-              Icon(Icons.person_pin_circle, color: Colors.white, size: 100.0),
+              Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                      border: Border.all(
+                        color: Colors.white,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(90))),
+                  child: Image(
+                    image: AssetImage('assets/img/rotary-logo.png'),
+                    width: 100,
+                    height: 100,
+                  ))
+              // Icon(Icons.person_pin_circle, color: Colors.white, size: 100.0),
+              ,
               SizedBox(height: 10.0, width: double.infinity),
               Text('Rotary International',
                   style: TextStyle(color: Colors.white, fontSize: 25.0))

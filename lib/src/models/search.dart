@@ -116,116 +116,116 @@ class Search {
 }
 
 class CiudadEntity {
-    int id;
+    int idCiudad;
     String nombreCiudad;
     int idDepartamento;
 
     CiudadEntity({
-        this.id,
+        this.idCiudad,
         this.nombreCiudad,
         this.idDepartamento,
     });
 
     CiudadEntity copyWith({
-        int id,
+        int idCiudad,
         String nombreCiudad,
         int idDepartamento,
     }) => 
         CiudadEntity(
-            id: id ?? this.id,
+            idCiudad: idCiudad ?? this.idCiudad,
             nombreCiudad: nombreCiudad ?? this.nombreCiudad,
             idDepartamento: idDepartamento ?? this.idDepartamento,
         );
 
     factory CiudadEntity.fromJson(Map<String, dynamic> json) => CiudadEntity(
-        id: json["id"] == null ? null : json["id"],
+        idCiudad: json["idCiudad"] == null ? null : json["idCiudad"],
         nombreCiudad: json["nombreCiudad"] == null ? null : json["nombreCiudad"],
         idDepartamento: json["idDepartamento"] == null ? null : json["idDepartamento"],
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
+        "idCiudad": idCiudad == null ? null : idCiudad,
         "nombreCiudad": nombreCiudad == null ? null : nombreCiudad,
         "idDepartamento": idDepartamento == null ? null : idDepartamento,
     };
 }
 
 class ClubEntity {
-    int id;
+    int idClub;
     String nombreClub;
 
     ClubEntity({
-        this.id,
+        this.idClub,
         this.nombreClub,
     });
 
     ClubEntity copyWith({
-        int id,
+        int idClub,
         String nombreClub,
     }) => 
         ClubEntity(
-            id: id ?? this.id,
+            idClub: idClub ?? this.idClub,
             nombreClub: nombreClub ?? this.nombreClub,
         );
 
     factory ClubEntity.fromJson(Map<String, dynamic> json) => ClubEntity(
-        id: json["id"] == null ? null : json["id"],
+        idClub: json["idClub"] == null ? null : json["idClub"],
         nombreClub: json["nombreClub"] == null ? null : json["nombreClub"],
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
+        "idClub": idClub == null ? null : idClub,
         "nombreClub": nombreClub == null ? null : nombreClub,
     };
 }
 
 class EspecialidadEntity {
-    int id;
+    int idEspecialidad;
     String nombreEspecialidad;
-    int idProfesion;
+    int profesion;
 
     EspecialidadEntity({
-        this.id,
+        this.idEspecialidad,
         this.nombreEspecialidad,
-        this.idProfesion,
+        this.profesion,
     });
 
     EspecialidadEntity copyWith({
-        int id,
+        int idEspecialidad,
         String nombreEspecialidad,
-        int idProfesion,
+        int profesion,
     }) => 
         EspecialidadEntity(
-            id: id ?? this.id,
+            idEspecialidad: idEspecialidad ?? this.idEspecialidad,
             nombreEspecialidad: nombreEspecialidad ?? this.nombreEspecialidad,
-            idProfesion: idProfesion ?? this.idProfesion,
+            profesion: profesion ?? this.profesion,
         );
 
     factory EspecialidadEntity.fromJson(Map<String, dynamic> json) => EspecialidadEntity(
-        id: json["id"] == null ? null : json["id"],
+        idEspecialidad: json["idEspecialidad"] == null ? null : json["idEspecialidad"],
         nombreEspecialidad: json["nombreEspecialidad"] == null ? null : json["nombreEspecialidad"],
-        idProfesion: json["idProfesion"] == null ? null : json["idProfesion"],
+        profesion: json["profesion"] == null ? null : json["profesion"],
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
+        "idEspecialidad": idEspecialidad == null ? null : idEspecialidad,
         "nombreEspecialidad": nombreEspecialidad == null ? null : nombreEspecialidad,
-        "idProfesion": idProfesion == null ? null : idProfesion,
+        "profesion": profesion == null ? null : profesion,
     };
 }
 
 class InformacionComercialEntity {
-    int id;
+    int idInformacion;
     String nombreComercial;
     String direccionComercial;
     String descripcionServicio;
     String telefono;
     String paginaEmail;
-    int ofrecer;
+    dynamic ofrecer;
     int ciudad;
 
     InformacionComercialEntity({
-        this.id,
+        this.idInformacion,
         this.nombreComercial,
         this.direccionComercial,
         this.descripcionServicio,
@@ -236,17 +236,17 @@ class InformacionComercialEntity {
     });
 
     InformacionComercialEntity copyWith({
-        int id,
+        int idInformacion,
         String nombreComercial,
         String direccionComercial,
         String descripcionServicio,
         String telefono,
         String paginaEmail,
-        int ofrecer,
+        dynamic ofrecer,
         int ciudad,
     }) => 
         InformacionComercialEntity(
-            id: id ?? this.id,
+            idInformacion: idInformacion ?? this.idInformacion,
             nombreComercial: nombreComercial ?? this.nombreComercial,
             direccionComercial: direccionComercial ?? this.direccionComercial,
             descripcionServicio: descripcionServicio ?? this.descripcionServicio,
@@ -257,71 +257,71 @@ class InformacionComercialEntity {
         );
 
     factory InformacionComercialEntity.fromJson(Map<String, dynamic> json) => InformacionComercialEntity(
-        id: json["id"] == null ? null : json["id"],
+        idInformacion: json["idInformacion"] == null ? null : json["idInformacion"],
         nombreComercial: json["nombreComercial"] == null ? null : json["nombreComercial"],
         direccionComercial: json["direccionComercial"] == null ? null : json["direccionComercial"],
         descripcionServicio: json["descripcionServicio"] == null ? null : json["descripcionServicio"],
         telefono: json["telefono"] == null ? null : json["telefono"],
         paginaEmail: json["paginaEmail"] == null ? null : json["paginaEmail"],
-        ofrecer: json["ofrecer"] == null ? null : json["ofrecer"],
+        ofrecer: json["ofrecer"],
         ciudad: json["ciudad"] == null ? null : json["ciudad"],
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
+        "idInformacion": idInformacion == null ? null : idInformacion,
         "nombreComercial": nombreComercial == null ? null : nombreComercial,
         "direccionComercial": direccionComercial == null ? null : direccionComercial,
         "descripcionServicio": descripcionServicio == null ? null : descripcionServicio,
         "telefono": telefono == null ? null : telefono,
         "paginaEmail": paginaEmail == null ? null : paginaEmail,
-        "ofrecer": ofrecer == null ? null : ofrecer,
+        "ofrecer": ofrecer,
         "ciudad": ciudad == null ? null : ciudad,
     };
 }
 
 class UsuarioEntity {
     int idUsuario;
+    String nombreUsuario;
     dynamic contrasenia;
     String tipo;
     int estado;
-    String nombreUsuario;
 
     UsuarioEntity({
         this.idUsuario,
+        this.nombreUsuario,
         this.contrasenia,
         this.tipo,
         this.estado,
-        this.nombreUsuario,
     });
 
     UsuarioEntity copyWith({
         int idUsuario,
+        String nombreUsuario,
         dynamic contrasenia,
         String tipo,
         int estado,
-        String nombreUsuario,
     }) => 
         UsuarioEntity(
             idUsuario: idUsuario ?? this.idUsuario,
+            nombreUsuario: nombreUsuario ?? this.nombreUsuario,
             contrasenia: contrasenia ?? this.contrasenia,
             tipo: tipo ?? this.tipo,
             estado: estado ?? this.estado,
-            nombreUsuario: nombreUsuario ?? this.nombreUsuario,
         );
 
     factory UsuarioEntity.fromJson(Map<String, dynamic> json) => UsuarioEntity(
-        idUsuario: json["id_usuario"] == null ? null : json["id_usuario"],
+        idUsuario: json["idUsuario"] == null ? null : json["idUsuario"],
+        nombreUsuario: json["nombreUsuario"] == null ? null : json["nombreUsuario"],
         contrasenia: json["contrasenia"],
         tipo: json["tipo"] == null ? null : json["tipo"],
         estado: json["estado"] == null ? null : json["estado"],
-        nombreUsuario: json["nombreUsuario"] == null ? null : json["nombreUsuario"],
     );
 
     Map<String, dynamic> toJson() => {
-        "id_usuario": idUsuario == null ? null : idUsuario,
+        "idUsuario": idUsuario == null ? null : idUsuario,
+        "nombreUsuario": nombreUsuario == null ? null : nombreUsuario,
         "contrasenia": contrasenia,
         "tipo": tipo == null ? null : tipo,
         "estado": estado == null ? null : estado,
-        "nombreUsuario": nombreUsuario == null ? null : nombreUsuario,
     };
 }

@@ -13,6 +13,7 @@ import 'package:rotary/src/models/socio.dart';
 import 'package:rotary/src/models/usuario.dart';
 import 'package:rotary/src/providers/http/ciudad_provider.dart';
 import 'package:rotary/src/providers/http/club_provider.dart';
+import 'package:rotary/src/providers/http/email_provider.dart';
 import 'package:rotary/src/providers/http/especialidad_provider.dart';
 import 'package:rotary/src/providers/http/informacion_comercial.dart';
 import 'package:rotary/src/providers/http/socio_provider.dart';
@@ -33,6 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
   EspecialidadProvider especialidadProvider = new EspecialidadProvider();
   UsuarioProvider usuarioProvider = new UsuarioProvider();
   SocioProvider socioProvider = new SocioProvider();
+  EmailProvider emailProvider = new EmailProvider();
   InformacionComercialProvider informacionComercialProvider =
       new InformacionComercialProvider();
   CiudadProvider ciudadProvider = new CiudadProvider();
@@ -601,19 +603,19 @@ class _RegisterPageState extends State<RegisterPage> {
     InformacionComercial infoco = new InformacionComercial();
 
     usu.nombreUsuario = numeroCelular.text;
-    usu.estado = 1;
+    usu.estado = 0;
     usu.contrasenia = numeroCedula.text
         .substring(numeroCedula.text.length - 4, numeroCedula.text.length);
     usu.tipo = 'SOC';
-    await usuarioProvider.save(usu).then((res) async {
-      if (res != null) {
+    await usuarioProvider.save(usu).then((usu) async {
+      if (usu != null) {
         // TODO: Hacer Switch para Preguntar si desea registrar informacion Comercial, por ahora se hace como si todos fueran a registrarla
         infoco.nombreComercial = nombreComercial.text;
         infoco.direccionComercial = direccionComercial.text;
         await ciudadFuture.then((ci) {
           infoco.ciudad = ci.firstWhere((el) {
             return el.nombreCiudad == ciudad;
-          }).id;
+          }).idCiudad;
         });
         infoco.telefono = telefono.text;
         infoco.paginaEmail = paginacorreo.text;
@@ -630,21 +632,24 @@ class _RegisterPageState extends State<RegisterPage> {
             soc.nombreCompleto = nombreCompleto.text;
             soc.correoElectronico = correoElectronico.text;
             soc.celular = numeroCelular.text;
-            clubFuture.then((cl) {
+            soc.informacionComercial = info.idInformacion;
+            soc.usuario = usu.idUsuario;
+            await clubFuture.then((cl) {
               soc.club = cl.firstWhere((el) {
                 return el.nombreClub == club;
-              }).id;
+              }).idClub;
             });
-            especialidadFuture.then((es) {
+            await especialidadFuture.then((es) {
               soc.especialidad = es.firstWhere((el) {
                 return el.nombreEspecialidad == especialidad;
-              }).id;
+              }).idEspecialidad;
             });
             await socioProvider.save(soc).then((sc) {
               if (sc != null) {
                 Navigator.of(context, rootNavigator: true).pop('dialog');
                 EmailDto email = new EmailDto();
                 email.email = correoElectronico.text;
+                emailProvider.save(email);
                 _mostrarAlertInfo(context,
                     'Registro Exitoso, su cuenta sera activada por un Administrador, usted sera notificado por correo');
               } else {
@@ -679,7 +684,7 @@ class _RegisterPageState extends State<RegisterPage> {
             actions: <Widget>[
               FlatButton(
                 child: Text('Aceptar'),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(context)..pop(),
               ),
             ],
           );

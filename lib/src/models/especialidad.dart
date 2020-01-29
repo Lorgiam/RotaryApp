@@ -1,45 +1,44 @@
+// To parse this JSON data, do
+//
+//     final especialidad = especialidadFromJson(jsonString);
+
 import 'dart:convert';
 
-List<Especialidad> especialidadFromJson(String str) => List<Especialidad>.from(
-    json.decode(str).map((x) => Especialidad.fromJson(x)));
+List<Especialidad> especialidadFromJson(String str) => List<Especialidad>.from(json.decode(str).map((x) => Especialidad.fromJson(x)));
 
-String especialidadToJson(List<Especialidad> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String especialidadToJson(List<Especialidad> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Especialidad {
-  int id;
-  String nombreEspecialidad;
-  int idProfesion;
+    int idEspecialidad;
+    String nombreEspecialidad;
+    int profesion;
 
-  Especialidad({
-    this.id,
-    this.nombreEspecialidad,
-    this.idProfesion,
-  });
+    Especialidad({
+        this.idEspecialidad,
+        this.nombreEspecialidad,
+        this.profesion,
+    });
 
-  Especialidad copyWith({
-    int id,
-    String nombreEspecialidad,
-    int idProfesion,
-  }) =>
-      Especialidad(
-        id: id ?? this.id,
-        nombreEspecialidad: nombreEspecialidad ?? this.nombreEspecialidad,
-        idProfesion: idProfesion ?? this.idProfesion,
-      );
+    Especialidad copyWith({
+        int idEspecialidad,
+        String nombreEspecialidad,
+        int profesion,
+    }) => 
+        Especialidad(
+            idEspecialidad: idEspecialidad ?? this.idEspecialidad,
+            nombreEspecialidad: nombreEspecialidad ?? this.nombreEspecialidad,
+            profesion: profesion ?? this.profesion,
+        );
 
-  factory Especialidad.fromJson(Map<String, dynamic> json) => Especialidad(
-        id: json["id"] == null ? null : json["id"],
-        nombreEspecialidad: json["nombreEspecialidad"] == null
-            ? null
-            : json["nombreEspecialidad"],
-        idProfesion: json["idProfesion"] == null ? null : json["idProfesion"],
-      );
+    factory Especialidad.fromJson(Map<String, dynamic> json) => Especialidad(
+        idEspecialidad: json["idEspecialidad"] == null ? null : json["idEspecialidad"],
+        nombreEspecialidad: json["nombreEspecialidad"] == null ? null : json["nombreEspecialidad"],
+        profesion: json["profesion"] == null ? null : json["profesion"],
+    );
 
-  Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
-        "nombreEspecialidad":
-            nombreEspecialidad == null ? null : nombreEspecialidad,
-        "idProfesion": idProfesion == null ? null : idProfesion,
-      };
+    Map<String, dynamic> toJson() => {
+        "idEspecialidad": idEspecialidad == null ? null : idEspecialidad,
+        "nombreEspecialidad": nombreEspecialidad == null ? null : nombreEspecialidad,
+        "profesion": profesion == null ? null : profesion,
+    };
 }

@@ -7,23 +7,42 @@ import 'package:rotary/src/utils/constants.dart';
 
 class EmailProvider {
   EmailProvider();
-}
 
-Future<int> save(EmailDto emailDto) async {
-  final Map<String, String> mapHeaders = {
-    'Content-type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-  };
-  return await http
-      .post('http://${Constants.URL_API}/mail/send',
-          headers: mapHeaders, body: json.encode(emailDto.toJson()))
-      .then((jsonData) {
-    if (jsonData.statusCode == 200) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }).catchError((err) {
-    print(err);
-  });
+  Future<int> save(EmailDto emailDto) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+    return await http
+        .post('http://${Constants.URL_API}/mail/send',
+            headers: mapHeaders, body: json.encode(emailDto.toJson()))
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
+  Future<int> saveSoc(EmailDto emailDto) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+    return await http
+        .post('http://${Constants.URL_API}/mail/sendSoc',
+            headers: mapHeaders, body: json.encode(emailDto.toJson()))
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
 }

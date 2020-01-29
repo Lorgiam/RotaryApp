@@ -39,6 +39,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     ls
       ..add(
         new ListTile(
+          leading: Icon(Icons.person),
+          title: Text('Activar Socios'),
+          onTap: () {
+            // change app state...
+            Navigator.popAndPushNamed(context, 'valid'); // close the drawer
+          },
+        ),
+      )
+      ..add(
+        new ListTile(
           leading: Icon(Icons.close),
           title: Text('Cerrar Sesion'),
           onTap: () {

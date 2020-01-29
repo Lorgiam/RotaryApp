@@ -4,37 +4,35 @@
 
 import 'dart:convert';
 
-List<Club> clubFromJson(String str) =>
-    List<Club>.from(json.decode(str).map((x) => Club.fromJson(x)));
+List<Club> clubFromJson(String str) => List<Club>.from(json.decode(str).map((x) => Club.fromJson(x)));
 
-String clubToJson(List<Club> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String clubToJson(List<Club> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Club {
-  int id;
-  String nombreClub;
+    int idClub;
+    String nombreClub;
 
-  Club({
-    this.id,
-    this.nombreClub,
-  });
+    Club({
+        this.idClub,
+        this.nombreClub,
+    });
 
-  Club copyWith({
-    int id,
-    String nombreClub,
-  }) =>
-      Club(
-        id: id ?? this.id,
-        nombreClub: nombreClub ?? this.nombreClub,
-      );
+    Club copyWith({
+        int idClub,
+        String nombreClub,
+    }) => 
+        Club(
+            idClub: idClub ?? this.idClub,
+            nombreClub: nombreClub ?? this.nombreClub,
+        );
 
-  factory Club.fromJson(Map<String, dynamic> json) => Club(
-        id: json["id"] == null ? null : json["id"],
+    factory Club.fromJson(Map<String, dynamic> json) => Club(
+        idClub: json["idClub"] == null ? null : json["idClub"],
         nombreClub: json["nombreClub"] == null ? null : json["nombreClub"],
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
+    Map<String, dynamic> toJson() => {
+        "idClub": idClub == null ? null : idClub,
         "nombreClub": nombreClub == null ? null : nombreClub,
-      };
+    };
 }
