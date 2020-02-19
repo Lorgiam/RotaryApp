@@ -37,12 +37,10 @@ class UsuarioProvider {
       'Content-type': 'application/json',
       'Access-Control-Allow-Origin': '*',
     };
-    print('http://${Constants.URL_API}/usuario/updateEstado/$id/$estado');
+
     return await http
-        .get(
-      'http://${Constants.URL_API}/usuario/updateEstado/$id/$estado',
-      headers: mapHeaders
-    )
+        .get('http://${Constants.URL_API}/usuario/updateEstado/$id/$estado',
+            headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
         final data = json.decode(jsonData.body);

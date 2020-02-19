@@ -19,6 +19,7 @@ class Search {
     int club;
     int especialidad;
     int usuario;
+    dynamic imagen;
     InformacionComercialEntity informacionComercialEntity;
     CiudadEntity ciudadEntity;
     ClubEntity clubEntity;
@@ -36,6 +37,7 @@ class Search {
         this.club,
         this.especialidad,
         this.usuario,
+        this.imagen,
         this.informacionComercialEntity,
         this.ciudadEntity,
         this.clubEntity,
@@ -54,6 +56,7 @@ class Search {
         int club,
         int especialidad,
         int usuario,
+        dynamic imagen,
         InformacionComercialEntity informacionComercialEntity,
         CiudadEntity ciudadEntity,
         ClubEntity clubEntity,
@@ -71,6 +74,7 @@ class Search {
             club: club ?? this.club,
             especialidad: especialidad ?? this.especialidad,
             usuario: usuario ?? this.usuario,
+            imagen: imagen ?? this.imagen,
             informacionComercialEntity: informacionComercialEntity ?? this.informacionComercialEntity,
             ciudadEntity: ciudadEntity ?? this.ciudadEntity,
             clubEntity: clubEntity ?? this.clubEntity,
@@ -89,6 +93,7 @@ class Search {
         club: json["club"] == null ? null : json["club"],
         especialidad: json["especialidad"] == null ? null : json["especialidad"],
         usuario: json["usuario"] == null ? null : json["usuario"],
+        imagen: json["imagen"],
         informacionComercialEntity: json["informacionComercialEntity"] == null ? null : InformacionComercialEntity.fromJson(json["informacionComercialEntity"]),
         ciudadEntity: json["ciudadEntity"] == null ? null : CiudadEntity.fromJson(json["ciudadEntity"]),
         clubEntity: json["clubEntity"] == null ? null : ClubEntity.fromJson(json["clubEntity"]),
@@ -107,6 +112,7 @@ class Search {
         "club": club == null ? null : club,
         "especialidad": especialidad == null ? null : especialidad,
         "usuario": usuario == null ? null : usuario,
+        "imagen": imagen,
         "informacionComercialEntity": informacionComercialEntity == null ? null : informacionComercialEntity.toJson(),
         "ciudadEntity": ciudadEntity == null ? null : ciudadEntity.toJson(),
         "clubEntity": clubEntity == null ? null : clubEntity.toJson(),

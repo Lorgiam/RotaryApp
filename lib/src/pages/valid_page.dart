@@ -4,6 +4,7 @@ import 'package:rotary/src/models/search.dart';
 import 'package:rotary/src/providers/http/email_provider.dart';
 import 'package:rotary/src/providers/http/search_provider.dart';
 import 'package:rotary/src/providers/http/usuario_provider.dart';
+import 'package:rotary/src/utils/constants.dart';
 
 class ValidPage extends StatefulWidget {
   ValidPage({Key key}) : super(key: key);
@@ -182,8 +183,11 @@ class _ValidPageState extends State<ValidPage> {
                                   Container(
                                     margin: EdgeInsets.all(5),
                                     child: FadeInImage(
-                                      image: AssetImage(
-                                          'assets/img/rotary-logo.png'),
+                                      image: socios.imagen == null
+                                          ? AssetImage(
+                                              'assets/img/rotary-logo.png')
+                                          : NetworkImage(
+                                              'http://${Constants.URL_API}/file/uploads/img/${socios.imagen}'),
                                       placeholder:
                                           AssetImage('assets/img/loading.gif'),
                                       fadeInDuration:
@@ -222,7 +226,6 @@ class _ValidPageState extends State<ValidPage> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       onPressed: () {
-                                        print(socios.usuarioEntity.idUsuario);
                                         _mostrarAlertInfo(
                                             context,
                                             socios.usuarioEntity.idUsuario,

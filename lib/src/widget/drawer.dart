@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:rotary/bloc/data_bloc.dart';
+import 'package:rotary/src/models/storage.dart';
+import 'package:rotary/src/providers/db/db.provider.dart';
 // import 'package:flutter/services.dart';
 
 class DrawerWidget extends StatefulWidget {
@@ -11,7 +14,10 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  Storage storage;
+  DataBloc dataBloc = new DataBloc();
   void initState() {
+    storage = Storage.fromJson(dataBloc.data);
     super.initState();
   }
 
@@ -36,41 +42,107 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   List<Widget> _listWidget() {
     List<Widget> ls = new List();
-    ls
-      ..add(
-        new ListTile(
-          leading: Icon(Icons.person),
-          title: Text('Activar Socios'),
-          onTap: () {
-            // change app state...
-            Navigator.popAndPushNamed(context, 'valid'); // close the drawer
-          },
-        ),
-      )
-      ..add(
-        new ListTile(
-          leading: Icon(Icons.close),
-          title: Text('Cerrar Sesion'),
-          onTap: () {
-            // change app state...
-            Navigator.popAndPushNamed(context, 'sincropes'); // close the drawer
-          },
-        ),
-      )
-      ..add(
-        new ListTile(
-          // leading: Icon(Icons.closeap),
-          title: Text('Salir'),
-          onTap: () {
-            // change app state...
-            _mostrarAlert(context);
-          },
-        ),
-      );
+    if (storage.tip == 'SOC') {
+      ls
+        ..add(
+          new ListTile(
+            leading: Icon(Icons.close),
+            title: Text('Cerrar Sesion'),
+            onTap: () async {
+              _mostrarAlert(context, 2, 'Desea Cerrar Sesión');
+            },
+          ),
+        )
+        ..add(
+          new ListTile(
+            // leading: Icon(Icons.closeap),
+            title: Text('Salir'),
+            onTap: () {
+              // change app state...
+              _mostrarAlert(context, 1, 'Desea Salir de la Aplicación');
+            },
+          ),
+        );
+    } else if (storage.tip == 'ADM') {
+      ls
+        ..add(
+          new ListTile(
+            leading: Icon(Icons.person),
+            title: Text('Activar Socios'),
+            onTap: () {
+              // change app state...
+              Navigator.popAndPushNamed(context, 'valid'); // close the drawer
+            },
+          ),
+        )
+        ..add(
+          new ListTile(
+            leading: Icon(Icons.close),
+            title: Text('Cerrar Sesion'),
+            onTap: () async {
+              _mostrarAlert(context, 2, 'Desea Cerrar Sesión');
+            },
+          ),
+        )
+        ..add(
+          new ListTile(
+            // leading: Icon(Icons.closeap),
+            title: Text('Salir'),
+            onTap: () {
+              // change app state...
+              _mostrarAlert(context, 1, 'Desea Salir de la Aplicación');
+            },
+          ),
+        );
+    } else if (storage.tip == 'SA') {
+      ls
+        ..add(
+          new ListTile(
+            leading: Icon(Icons.person),
+            title: Text('Activar Socios'),
+            onTap: () {
+              // change app state...
+              Navigator.popAndPushNamed(context, 'valid'); // close the drawer
+            },
+          ),
+        )
+        ..add(
+          new ListTile(
+            leading: Icon(Icons.person),
+            title: Text('Registrar Administradores'),
+            onTap: () {
+              // change app state...
+              Navigator.popAndPushNamed(
+                  context, 'register_admin'); // close the drawer
+            },
+          ),
+        )
+        ..add(
+          new ListTile(
+            leading: Icon(Icons.close),
+            title: Text('Cerrar Sesion'),
+            onTap: () async {
+              // change app state...
+              // close the drawer
+              _mostrarAlert(context, 2, 'Desea Cerrar Sesión');
+            },
+          ),
+        )
+        ..add(
+          new ListTile(
+            // leading: Icon(Icons.closeap),
+            title: Text('Salir'),
+            onTap: () {
+              // change app state...
+              _mostrarAlert(context, 1, 'Desea Salir de la Aplicación');
+            },
+          ),
+        );
+    }
     return ls;
   }
 
-  void _mostrarAlert(BuildContext context) {
+  void _mostrarAlert(BuildContext context, int tipo, String msg) {
     showDialog(
         context: context,
         barrierDismissible: true,
@@ -79,7 +151,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0)),
             // title: Text('Historia Clinica'),
-            content: Text('Desea Salir de la Aplicación'),
+            content: Text(msg),
             actions: <Widget>[
               FlatButton(
                 child: Text('Cancelar'),
@@ -87,9 +159,15 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ),
               FlatButton(
                 child: Text('Aceptar'),
-                onPressed: () {
-                  exit(0);
-                  // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+                onPressed: () async {
+                  if (tipo == 1) {
+                    exit(0);
+                  } else {
+                    await DBProvider.db.deleteUsuario(storage.nme).then((e) {
+                      Navigator.pop(context);
+                      Navigator.pushReplacementNamed(context, '/');
+                    });
+                  }
                 },
               ),
             ],

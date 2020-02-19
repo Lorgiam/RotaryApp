@@ -9,12 +9,12 @@ SearchDto searchDtoFromJson(String str) => SearchDto.fromJson(json.decode(str));
 String searchDtoToJson(SearchDto data) => json.encode(data.toJson());
 
 class SearchDto {
-    String especialidad;
+    String categoria;
     String descripcion;
     String ciudad;
 
     SearchDto({
-        this.especialidad,
+        this.categoria,
         this.descripcion,
         this.ciudad,
     });
@@ -25,19 +25,19 @@ class SearchDto {
         String ciudad,
     }) => 
         SearchDto(
-            especialidad: especialidad ?? this.especialidad,
+            categoria: especialidad ?? this.categoria,
             descripcion: descripcion ?? this.descripcion,
             ciudad: ciudad ?? this.ciudad,
         );
 
     factory SearchDto.fromJson(Map<String, dynamic> json) => SearchDto(
-        especialidad: json["especialidad"] == null ? null : json["especialidad"],
+        categoria: json["categoria"] == null ? null : json["categoria"],
         descripcion: json["descripcion"] == null ? null : json["descripcion"],
         ciudad: json["ciudad"] == null ? null : json["ciudad"],
     );
 
     Map<String, dynamic> toJson() => {
-        "especialidad": especialidad == null ? null : especialidad,
+        "categoria": categoria == null ? null : categoria,
         "descripcion": descripcion == null ? null : descripcion,
         "ciudad": ciudad == null ? null : ciudad,
     };

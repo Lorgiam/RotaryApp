@@ -4,13 +4,17 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rotary/src/dto/categoria_socio_dto.dart';
 import 'package:rotary/src/dto/email_dto.dart';
+import 'package:rotary/src/models/categoria.dart';
 import 'package:rotary/src/models/ciudad.dart';
 import 'package:rotary/src/models/club.dart';
 import 'package:rotary/src/models/especialidad.dart';
 import 'package:rotary/src/models/informacion_comercial.dart';
 import 'package:rotary/src/models/socio.dart';
 import 'package:rotary/src/models/usuario.dart';
+import 'package:rotary/src/providers/http/categoria_provider.dart';
+import 'package:rotary/src/providers/http/categoria_socio_provider.dart';
 import 'package:rotary/src/providers/http/ciudad_provider.dart';
 import 'package:rotary/src/providers/http/club_provider.dart';
 import 'package:rotary/src/providers/http/email_provider.dart';
@@ -39,6 +43,8 @@ class _RegisterPageState extends State<RegisterPage> {
       new InformacionComercialProvider();
   CiudadProvider ciudadProvider = new CiudadProvider();
   UploadProvider uploadProvider = new UploadProvider();
+  CategoriaProvider categoriaProvider = new CategoriaProvider();
+  CategoriaSocioProvider categoriaSocioProvider = new CategoriaSocioProvider();
   // Input
   TextEditingController nombreCompleto = new TextEditingController();
   TextEditingController numeroCedula = new TextEditingController();
@@ -54,6 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String club;
   String especialidad;
   String ciudad;
+  List<dynamic> categorias = new List();
   // Variable de Ancho de la Pantalla
   var _screenSize;
   // Variable File para Visualizacion de la Imagen Tomada o Seleccionada
@@ -62,12 +69,16 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<List<Ciudad>> ciudadFuture;
   Future<List<Club>> clubFuture;
   Future<List<Especialidad>> especialidadFuture;
+  Future<List<Categoria>> categoriaFuture;
+
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
   @override
   void initState() {
     ciudadFuture = ciudadProvider.getCiudades();
     clubFuture = clubProvider.getClubes();
-    especialidadFuture = especialidadProvider.getEspecialidades();
+    especialidadFuture = especialidadProvider.getEspecialidadesL();
+    categoriaFuture = categoriaProvider.getCategorias();
     // TODO: implement initState
     super.initState();
   }
@@ -75,6 +86,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     _screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Registro'),
@@ -220,10 +232,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 width: _screenSize.width * 0.9,
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Expanded(
                       child: Container(
+                        alignment: Alignment.bottomCenter,
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         child: _dropCiudades(),
                       ),
@@ -248,51 +262,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                width: _screenSize.width * 0.9,
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: MultiSelect(
-                          autovalidate: false,
-                          titleText: 'Categoria',
-                          validator: (value) {
-                            if (value == null) {
-                              return 'Por favor selecciona una o más opciones';
-                            }
-                          },
-                          errorText: 'Por favor selecciona una o más opciones',
-                          dataSource: [
-                            {
-                              "display": "Alimentos",
-                              "value": 1,
-                            },
-                            {
-                              "display": "Tecnologia",
-                              "value": 2,
-                            },
-                            {
-                              "display": "Viajes",
-                              "value": 3,
-                            },
-                            {
-                              "display": "Medicina",
-                              "value": 4,
-                            }
-                          ],
-                          textField: 'display',
-                          valueField: 'value',
-                          filterable: true,
-                          required: true,
-                          value: null,
-                          onSaved: (value) {
-                            print('The value is $value');
-                          }),
-                    ),
-                  ],
-                ),
-              ),
+              _dropCategoria(),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 width: _screenSize.width * 0.9,
@@ -379,6 +349,59 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Widget _dropCategoria() {
+    return FutureBuilder(
+        future: categoriaFuture,
+        builder:
+            (BuildContext context, AsyncSnapshot<List<Categoria>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+
+          List<dynamic> array = new List();
+          snapshot.data.forEach((x) {
+            array.add({
+              'idCategoria': x.idCategoria,
+              'nombreCategoria': x.nombreCategoria
+            });
+          });
+
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            width: _screenSize.width * 0.9,
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Form(
+                    key: _formKey,
+                    child: MultiSelect(
+                        autovalidate: false,
+                        titleText: 'Categoria',
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Por favor selecciona una o más opciones';
+                          }
+                        },
+                        errorText: 'Por favor selecciona una o más opciones',
+                        dataSource: array,
+                        textField: 'nombreCategoria',
+                        valueField: 'idCategoria',
+                        filterable: true,
+                        required: true,
+                        value: null,
+                        onSaved: (value) {
+                          setState(() {
+                            categorias = value;
+                          });
+                        }),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   Widget _fieldNumeroCedula() {
     return TextFormField(
       enabled: true,
@@ -398,7 +421,7 @@ class _RegisterPageState extends State<RegisterPage> {
             return Container();
           }
 
-          return new SearchableDropdown(
+          return SearchableDropdown(
             isExpanded: true,
             items: snapshot.data.map((x) {
               final nme = x.nombreCiudad.trim();
@@ -430,7 +453,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _dropEspecialidad() {
     return FutureBuilder(
-        future: especialidadProvider.getEspecialidades(),
+        future: especialidadProvider.getEspecialidadesL(),
         builder:
             (BuildContext context, AsyncSnapshot<List<Especialidad>> snapshot) {
           if (!snapshot.hasData) {
@@ -542,7 +565,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextField(
       enableInteractiveSelection: false,
       controller: _date,
-      decoration: InputDecoration(labelText: 'Fecha de Nacimiento'),
+      decoration: InputDecoration(labelText: 'Fec. Nacimiento'),
       onTap: () {
         //Linea para quitar el foco del elemento
         FocusScope.of(context).requestFocus(new FocusNode());
@@ -555,7 +578,7 @@ class _RegisterPageState extends State<RegisterPage> {
     DateTime picked = await showDatePicker(
       context: context,
       initialDate: new DateTime.now(),
-      firstDate: new DateTime(2018),
+      firstDate: new DateTime(1920),
       lastDate: new DateTime(2025),
     );
 
@@ -589,7 +612,8 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _procesarImagen(ImageSource source) async {
-    foto = await ImagePicker.pickImage(source: source);
+    foto = await ImagePicker.pickImage(
+        maxHeight: 1200, maxWidth: 1200, imageQuality: 100, source: source);
     if (foto != null) {
       //limpieza
     }
@@ -597,6 +621,9 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _registro() async {
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+    }
     _mostrarAlert(context);
     Usuario usu = new Usuario();
     Socio soc = new Socio();
@@ -622,11 +649,6 @@ class _RegisterPageState extends State<RegisterPage> {
         infoco.descripcionServicio = descripcion.text;
         await informacionComercialProvider.save(infoco).then((info) async {
           if (info != null) {
-            if (foto != null) {
-              await uploadProvider.save(foto).then((res) {
-                //TODO: Aqui se seteara la url de la imagen cargada
-              });
-            }
             soc.numeroCedula = numeroCedula.text;
             soc.fechaNacimiento = DateTime.parse(_fecha);
             soc.nombreCompleto = nombreCompleto.text;
@@ -644,14 +666,27 @@ class _RegisterPageState extends State<RegisterPage> {
                 return el.nombreEspecialidad == especialidad;
               }).idEspecialidad;
             });
-            await socioProvider.save(soc).then((sc) {
+
+            await socioProvider.save(soc).then((sc) async {
+              if (foto != null) {
+                await uploadProvider.save(foto, sc.idSocio);
+              }
+              if (categorias.length > 0) {
+                categorias.forEach((x) async {
+                  CategoriaSocioDto cts = new CategoriaSocioDto();
+                  cts.idCategoria = x;
+                  cts.idSocio = sc.idSocio;
+                  await categoriaSocioProvider.save(cts);
+                });
+              }
               if (sc != null) {
-                Navigator.of(context, rootNavigator: true).pop('dialog');
                 EmailDto email = new EmailDto();
                 email.email = correoElectronico.text;
-                emailProvider.save(email);
-                _mostrarAlertInfo(context,
-                    'Registro Exitoso, su cuenta sera activada por un Administrador, usted sera notificado por correo');
+                await emailProvider.save(email).then((res) {
+                  Navigator.of(context, rootNavigator: true).pop('dialog');
+                  _mostrarAlertInfo(context,
+                      'Registro Exitoso, su cuenta sera activada por un Administrador, usted sera notificado por correo');
+                });
               } else {
                 // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
               }
@@ -684,7 +719,7 @@ class _RegisterPageState extends State<RegisterPage> {
             actions: <Widget>[
               FlatButton(
                 child: Text('Aceptar'),
-                onPressed: () => Navigator.of(context)..pop(),
+                onPressed: () => Navigator.of(context)..pop()..pop(),
               ),
             ],
           );

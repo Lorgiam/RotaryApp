@@ -32,4 +32,32 @@ class CategoriaProvider {
       print(err);
     });
   }
+
+  Future<List<Categoria>> findCategoriasBySocios() async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+
+    return await http
+        .get('http://${Constants.URL_API}/categoria/findCategoriasBySocios',
+            headers: mapHeaders)
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        Iterable l = json.decode(jsonData.body);
+        if (l.isNotEmpty) {
+          Categoria categoria = new Categoria();
+          categoria.nombreCategoria = 'Todas las Categorias';
+          return List<Categoria>.from(l.map((x) => Categoria.fromJson(x)))
+            ..insert(0, categoria);
+        } else {
+          return [];
+        }
+      } else {
+        return null;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
 }

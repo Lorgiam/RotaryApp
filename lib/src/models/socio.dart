@@ -4,12 +4,12 @@
 
 import 'dart:convert';
 
-List<Socio> socioFromJson(String str) => List<Socio>.from(json.decode(str).map((x) => Socio.fromJson(x)));
+Socio socioFromJson(String str) => Socio.fromJson(json.decode(str));
 
-String socioToJson(List<Socio> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String socioToJson(Socio data) => json.encode(data.toJson());
 
 class Socio {
-    int id;
+    int idSocio;
     String numeroCedula;
     String nombreCompleto;
     String correoElectronico;
@@ -19,9 +19,10 @@ class Socio {
     int club;
     int especialidad;
     int usuario;
+    String imagen;
 
     Socio({
-        this.id,
+        this.idSocio,
         this.numeroCedula,
         this.nombreCompleto,
         this.correoElectronico,
@@ -31,10 +32,11 @@ class Socio {
         this.club,
         this.especialidad,
         this.usuario,
+        this.imagen,
     });
 
     Socio copyWith({
-        int id,
+        int idSocio,
         String numeroCedula,
         String nombreCompleto,
         String correoElectronico,
@@ -44,9 +46,10 @@ class Socio {
         int club,
         int especialidad,
         int usuario,
+        String imagen,
     }) => 
         Socio(
-            id: id ?? this.id,
+            idSocio: idSocio ?? this.idSocio,
             numeroCedula: numeroCedula ?? this.numeroCedula,
             nombreCompleto: nombreCompleto ?? this.nombreCompleto,
             correoElectronico: correoElectronico ?? this.correoElectronico,
@@ -56,10 +59,11 @@ class Socio {
             club: club ?? this.club,
             especialidad: especialidad ?? this.especialidad,
             usuario: usuario ?? this.usuario,
+            imagen: imagen ?? this.imagen,
         );
 
     factory Socio.fromJson(Map<String, dynamic> json) => Socio(
-        id: json["id"] == null ? null : json["id"],
+        idSocio: json["idSocio"] == null ? null : json["idSocio"],
         numeroCedula: json["numeroCedula"] == null ? null : json["numeroCedula"],
         nombreCompleto: json["nombreCompleto"] == null ? null : json["nombreCompleto"],
         correoElectronico: json["correoElectronico"] == null ? null : json["correoElectronico"],
@@ -69,10 +73,11 @@ class Socio {
         club: json["club"] == null ? null : json["club"],
         especialidad: json["especialidad"] == null ? null : json["especialidad"],
         usuario: json["usuario"] == null ? null : json["usuario"],
+        imagen: json["imagen"] == null ? null : json["imagen"],
     );
 
     Map<String, dynamic> toJson() => {
-        "id": id == null ? null : id,
+        "idSocio": idSocio == null ? null : idSocio,
         "numeroCedula": numeroCedula == null ? null : numeroCedula,
         "nombreCompleto": nombreCompleto == null ? null : nombreCompleto,
         "correoElectronico": correoElectronico == null ? null : correoElectronico,
@@ -82,5 +87,6 @@ class Socio {
         "club": club == null ? null : club,
         "especialidad": especialidad == null ? null : especialidad,
         "usuario": usuario == null ? null : usuario,
+        "imagen": imagen == null ? null : imagen,
     };
 }

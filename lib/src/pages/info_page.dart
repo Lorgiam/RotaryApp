@@ -1,5 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:rotary/bloc/data_bloc.dart';
 import 'package:rotary/src/models/search.dart';
+import 'package:rotary/src/models/storage.dart';
+import 'package:rotary/src/providers/http/socio_provider.dart';
+import 'package:rotary/src/providers/http/upload_provider.dart';
+import 'package:rotary/src/utils/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class InfoPage extends StatefulWidget {
@@ -11,7 +19,25 @@ class InfoPage extends StatefulWidget {
 }
 
 class _InfoPageState extends State<InfoPage> {
+  Storage storage;
+  DataBloc dataBloc = new DataBloc();
+  File foto;
+  List<CustomPopupMenu> opts = <CustomPopupMenu>[
+    CustomPopupMenu(
+        title: 'Cargar Imagen', icon: Icons.photo_size_select_actual),
+    CustomPopupMenu(title: 'Tomar Foto', icon: Icons.camera_alt),
+  ];
   var _screenSize;
+  UploadProvider uploadProvider = new UploadProvider();
+  SocioProvider socioProvider = new SocioProvider();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    storage = Storage.fromJson(dataBloc.data);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     _screenSize = MediaQuery.of(context).size;
@@ -68,6 +94,46 @@ class _InfoPageState extends State<InfoPage> {
 
   Widget _crearAppbar(Search search) {
     return SliverAppBar(
+      actions: <Widget>[
+        search.usuario == storage.usu
+            ? PopupMenuButton<CustomPopupMenu>(
+                child: Container(
+                  margin: EdgeInsets.only(right: 20.0),
+                  child: Center(
+                    child: Icon(Icons.more_vert),
+                  ),
+                ),
+                elevation: 2.2,
+                onSelected: (elem) async {
+                  if (elem.title == 'Cargar Imagen') {
+                    _seleccionarImagen(context, search.id);
+                  } else {
+                    _tomarFoto(context, search.id);
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return opts.map((CustomPopupMenu opt) {
+                    return PopupMenuItem<CustomPopupMenu>(
+                        value: opt,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            new Icon(
+                              opt.icon,
+                              color: Colors.black,
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            new Text(opt.title)
+                          ],
+                        ));
+                  }).toList();
+                },
+              )
+            : Text('')
+      ],
       elevation: 2.0,
       backgroundColor: Colors.blue,
       expandedHeight: 250.0,
@@ -80,7 +146,10 @@ class _InfoPageState extends State<InfoPage> {
           style: TextStyle(color: Colors.white, fontSize: 16.0),
         ),
         background: FadeInImage(
-          image: AssetImage('assets/img/rotary-logo.png'),
+          image: search.imagen == null
+              ? AssetImage('assets/img/rotary-logo.png')
+              : NetworkImage(
+                  'http://${Constants.URL_API}/file/uploads/img/${search.imagen}'),
           placeholder: AssetImage('assets/img/loading.gif'),
           fadeInDuration: Duration(milliseconds: 150),
           fit: BoxFit.cover,
@@ -157,6 +226,7 @@ class _InfoPageState extends State<InfoPage> {
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
                                       Container(
+                                        width: _screenSize.width * 0.6,
                                         margin:
                                             EdgeInsets.symmetric(vertical: 10),
                                         padding:
@@ -304,6 +374,7 @@ class _InfoPageState extends State<InfoPage> {
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
                                       Container(
+                                        width: _screenSize.width * 0.6,
                                         margin:
                                             EdgeInsets.symmetric(vertical: 10),
                                         padding:
@@ -726,4 +797,32 @@ class _InfoPageState extends State<InfoPage> {
           ),
         ));
   }
+
+  _seleccionarImagen(BuildContext context, int id) async {
+    _procesarImagen(ImageSource.gallery, id);
+  }
+
+  _tomarFoto(BuildContext context, int id) async {
+    _procesarImagen(ImageSource.camera, id);
+  }
+
+  _procesarImagen(ImageSource source, int id) async {
+    foto = await ImagePicker.pickImage(
+        maxHeight: 1200, maxWidth: 1200, imageQuality: 100, source: source);
+    if (foto != null) {
+      await uploadProvider.save(foto, id);
+      await socioProvider.getSocioById((id)).then((el) {
+        setState(() {
+          widget.search.imagen = el.imagen;
+        });
+      });
+    }
+  }
+}
+
+class CustomPopupMenu {
+  CustomPopupMenu({this.title, this.icon});
+
+  String title;
+  IconData icon;
 }

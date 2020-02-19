@@ -4,9 +4,9 @@
 
 import 'dart:convert';
 
-List<Usuario> usuarioFromJson(String str) => List<Usuario>.from(json.decode(str).map((x) => Usuario.fromJson(x)));
+Usuario usuarioFromJson(String str) => Usuario.fromJson(json.decode(str));
 
-String usuarioToJson(List<Usuario> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String usuarioToJson(Usuario data) => json.encode(data.toJson());
 
 class Usuario {
     int idUsuario;

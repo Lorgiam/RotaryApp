@@ -45,4 +45,23 @@ class EmailProvider {
       print(err);
     });
   }
+
+  Future<int> saveAdm(EmailDto emailDto) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+    return await http
+        .post('http://${Constants.URL_API}/mail/sendAdm',
+            headers: mapHeaders, body: json.encode(emailDto.toJson()))
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
 }

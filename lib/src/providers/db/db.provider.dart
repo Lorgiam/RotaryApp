@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:rotary/src/models/Socio.dart';
+import 'package:rotary/src/models/usuario.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,50 +21,64 @@ class DBProvider {
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     final String path = join(documentsDirectory.path, 'ponedoras.db');
-    await deleteDatabase(path);
+
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       final Batch batch = db.batch()
         ..execute(
-            'CREATE TABLE IF NOT EXISTS socio(id INTEGER PRIMARY KEY AUTOINCREMENT,nme TEXT,cc TEXT,psw TEXT,ste INTEGER);');
+            'CREATE TABLE IF NOT EXISTS usuario(id INTEGER PRIMARY KEY AUTOINCREMENT,idUsuario INTEGER, nombreUsuario TEXT,contrasenia TEXT,tipo TEXT,estado INTEGER);');
       await batch.commit();
     });
   }
 
-  Future<int> insertSocio(Socio socio) async {
+  Future<int> insertUser(Usuario usuario) async {
     final db = await database;
-    return await db.insert('socio', socio.toJson()).then((res) {
+    return await db.insert('usuario', usuario.toJson()).then((res) {
       return res;
     }).catchError((err) {
       print(err);
     });
   }
 
-  Future<int> updateSocio(Socio socio) async {
+  Future<int> updateUsuario(Usuario usuario) async {
     final db = await database;
-    return await db.update('socio', socio.toJson(),
-        where: 'cc = ?', whereArgs: [socio.numeroCedula]).then((res) {
+    return await db.update('usuario', usuario.toJson(),
+        where: 'nombreUsuario = ?',
+        whereArgs: [usuario.nombreUsuario]).then((res) {
       return res;
     }).catchError((err) {
       print(err);
     });
   }
 
-  Future<Socio> getSocioByCC(String cc) async {
+  Future<Usuario> getUsuarioByUsername(String nombreUsuario) async {
     final db = await database;
-    return await db.query('socio', where: 'cc = ?', whereArgs: [cc]).then((sc) {
-      return sc.isNotEmpty ? Socio.fromJson(sc.first) : null;
+    return await db.query('usuario',
+        where: 'nombreUsuario = ?', whereArgs: [nombreUsuario]).then((usu) {
+      return usu.isNotEmpty ? Usuario.fromJson(usu.first) : null;
     }).catchError((err) {
       print(err);
     });
   }
 
-  Future<List<Socio>> getAllSocio() async {
+  Future<Usuario> getUsuario() async {
     final db = await database;
-    return await db.query('socio').then((scs) {
-      return scs.isNotEmpty
-          ? List<Socio>.from(scs.map((x) => Socio.fromJson(x)))
-          : [];
+    return await db.query('usuario').then((usu) {
+      return usu.isNotEmpty ? Usuario.fromJson(usu.first) : null;
+    }).catchError((err) {
+      print(err);
     });
+  }
+
+  Future<void> deleteUsuario(String nombreUsuario) async {
+    // Get a reference to the database.
+    final db = await database;
+
+    // Remove the Dog from the Database.
+    await db.delete('usuario',
+        // Use a `where` clause to delete a specific dog.
+        where: "nombreUsuario = ?",
+        // Pass the Dog's id as a whereArg to prevent SQL injection.
+        whereArgs: [nombreUsuario]);
   }
 }

@@ -21,7 +21,7 @@ class CiudadProvider {
         Iterable le = json.decode(l);
         if (le.isNotEmpty) {
           Ciudad ciudad = new Ciudad();
-          ciudad.nombreCiudad = 'Todas';
+          ciudad.nombreCiudad = 'Todas las Ciudades';
           return List<Ciudad>.from(le.map((x) => Ciudad.fromJson(x)))
             ..insert(0, ciudad);
         } else {

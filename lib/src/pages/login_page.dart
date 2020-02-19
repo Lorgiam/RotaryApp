@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:rotary/bloc/data_bloc.dart';
 import 'package:rotary/bloc/login_bloc.dart';
 import 'package:rotary/bloc/provider.dart';
+import 'package:rotary/src/dto/auth_dto.dart';
+import 'package:rotary/src/providers/db/db.provider.dart';
+import 'package:rotary/src/providers/http/auth_provider.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  LoginBloc bloc;
+  Size size;
+  @override
+  void initState() {
+    super.initState();
+    _validUser();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of(context);
-    final size = MediaQuery.of(context).size;
+    bloc = Provider.of(context);
+    size = MediaQuery.of(context).size;
     return Scaffold(
         body: Stack(
       children: <Widget>[
@@ -122,14 +139,70 @@ class LoginPage extends StatelessWidget {
   }
 
   _login(LoginBloc bloc, BuildContext context) async {
-    Navigator.pushNamed(context, 'home');
-    // Map info = await usuarioProvider.login(bloc.email, bloc.password);
+    _mostrarAlert(context);
+    DataBloc dataBloc = new DataBloc();
+    AuthProvider authProvider = new AuthProvider();
+    AuthDto authDto = new AuthDto();
+    authDto.username = bloc.email;
+    authDto.password = bloc.password;
+    await authProvider.login(authDto).then((res) async {
+      if (res != null) {
+        await DBProvider.db.getUsuario().then((el) async {
+          if (el == null) {
+            res.contrasenia = bloc.password;
+            await DBProvider.db.insertUser(res);
+          }
+        });
+        dataBloc.insertData({'tip': res.tipo, 'usu': res.idUsuario});
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+        Navigator.pushReplacementNamed(context, 'home');
+      } else {
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+        _mostrarAlertInfo(
+            context, 'Credenciales Incorrectas o Usuario Inactivo');
+      }
+    }).catchError((err) {
+      Navigator.of(context, rootNavigator: true).pop('dialog');
+      _mostrarAlertInfo(context, err);
+    });
+  }
 
-    // if (info['ok']) {
-    //   Navigator.pushReplacementNamed(context, 'home');
-    // } else {
-    //   mostrarAlerta(context, info['mensaje']);
-    // }
+  _validUser() async {
+    _mostrarAlert(context);
+    DataBloc dataBloc = new DataBloc();
+    AuthProvider authProvider = new AuthProvider();
+
+    await DBProvider.db.getUsuario().then((el) async {
+      if (el != null) {
+        AuthDto authDto = new AuthDto();
+        authDto.username = el.nombreUsuario;
+        authDto.password = el.contrasenia;
+        await authProvider.login(authDto).then((res) async {
+          if (res != null) {
+            dataBloc.insertData({
+              'tip': res.tipo,
+              'usu': res.idUsuario,
+              'nme': res.nombreUsuario
+            });
+            Navigator.of(context, rootNavigator: true).pop('dialog');
+            Navigator.pushReplacementNamed(context, 'home');
+          } else {
+            await DBProvider.db.deleteUsuario(el.nombreUsuario);
+            Navigator.of(context, rootNavigator: true).pop('dialog');
+            _mostrarAlertInfo(
+                context, 'Credenciales Incorrectas o Usuario Inactivo');
+          }
+        }).catchError((err) {
+          Navigator.of(context, rootNavigator: true).pop('dialog');
+          _mostrarAlertInfo(context, err);
+        });
+      } else {
+        Navigator.of(context, rootNavigator: true).pop('dialog');
+      }
+    }).catchError((err) {
+      Navigator.of(context, rootNavigator: true).pop('dialog');
+      _mostrarAlertInfo(context, err);
+    });
   }
 
   Widget _crearFondo(BuildContext context) {
@@ -163,20 +236,12 @@ class LoginPage extends StatelessWidget {
           padding: EdgeInsets.only(top: 80.0),
           child: Column(
             children: <Widget>[
-              Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                      border: Border.all(
-                        color: Colors.white,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(90))),
-                  child: Image(
-                    image: AssetImage('assets/img/rotary-logo.png'),
-                    width: 100,
-                    height: 100,
-                  ))
               // Icon(Icons.person_pin_circle, color: Colors.white, size: 100.0),
-              ,
+              Image(
+                image: AssetImage('assets/img/rotary-logo.png'),
+                width: 100,
+                height: 100,
+              ),
               SizedBox(height: 10.0, width: double.infinity),
               Text('Rotary International',
                   style: TextStyle(color: Colors.white, fontSize: 25.0))
@@ -185,5 +250,46 @@ class LoginPage extends StatelessWidget {
         )
       ],
     );
+  }
+
+  void _mostrarAlertInfo(BuildContext context, String texto) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)),
+            title: Text('Información'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[Text('$texto')],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Entendido'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        });
+  }
+
+  void _mostrarAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              title: Text('Por favor Espere...'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Center(child: CircularProgressIndicator()),
+                ],
+              ));
+        });
   }
 }

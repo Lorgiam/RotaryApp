@@ -1,13 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:rotary/bloc/data_bloc.dart';
 import 'package:rotary/src/dto/search_dto.dart';
+import 'package:rotary/src/models/categoria.dart';
 import 'package:rotary/src/models/ciudad.dart';
 import 'package:rotary/src/models/especialidad.dart';
 import 'package:rotary/src/models/search.dart';
+import 'package:rotary/src/models/storage.dart';
 import 'package:rotary/src/pages/info_page.dart';
+import 'package:rotary/src/providers/http/categoria_provider.dart';
 
 import 'package:rotary/src/providers/http/ciudad_provider.dart';
 import 'package:rotary/src/providers/http/especialidad_provider.dart';
 import 'package:rotary/src/providers/http/search_provider.dart';
+import 'package:rotary/src/utils/constants.dart';
 
 import 'package:rotary/src/widget/drawer.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
@@ -22,7 +29,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // Input
   TextEditingController buscar = new TextEditingController();
-  String especialidad;
+  String categoria;
   String ciudad;
 
   // Scroll
@@ -32,26 +39,30 @@ class _HomePageState extends State<HomePage> {
   EspecialidadProvider especialidadProvider = new EspecialidadProvider();
   CiudadProvider ciudadProvider = new CiudadProvider();
   SearchProvider searchProvider = new SearchProvider();
+  CategoriaProvider categoriaProvider = new CategoriaProvider();
 
   //Future
   Future<List<Search>> searchs;
 
   //Clases
   SearchDto searchDto;
+  Storage storage;
+
+  DataBloc dataBloc = new DataBloc();
 
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
-    especialidad = 'Todas';
-    ciudad = 'Todas';
+    storage = Storage.fromJson(dataBloc.data);
+    categoria = 'Todas las Categorias';
+    ciudad = 'Todas las Ciudades';
     searchDto = new SearchDto();
-    if (especialidad == 'Todas') {
-      searchDto.especialidad = null;
+    if (categoria == 'Todas las Categorias') {
+      searchDto.categoria = null;
     } else {
-      searchDto.especialidad = especialidad;
+      searchDto.categoria = categoria;
     }
-    if (ciudad == 'Todas') {
+    if (ciudad == 'Todas las Ciudades') {
       searchDto.ciudad = null;
     } else {
       searchDto.ciudad = ciudad;
@@ -66,112 +77,116 @@ class _HomePageState extends State<HomePage> {
             duration: Duration(milliseconds: 2500));
       }
     });
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final _screenSize = MediaQuery.of(context).size;
-    return Scaffold(
-      drawer: DrawerWidget(
-        key: UniqueKey(),
-      ),
-      appBar: AppBar(
-        title: Text('Rotary'),
-        actions: <Widget>[
-          // IconButton(
-          //   icon: Icon(
-          //     Icons.menu,
-          //     color: Colors.white,
-          //   ),
-          //   onPressed: () {
-          //     _scaffoldKey.currentState.openDrawer();
-          //   },
-          // ),
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              setState(() {
-                buscar.clear();
-                especialidad = 'Todas';
-                ciudad = 'Todas';
-                searchDto = new SearchDto();
-                if (especialidad == 'Todas') {
-                  searchDto.especialidad = null;
-                } else {
-                  searchDto.especialidad = especialidad;
-                }
-                if (ciudad == 'Todas') {
-                  searchDto.ciudad = null;
-                } else {
-                  searchDto.ciudad = ciudad;
-                }
-                searchDto.descripcion = buscar.text;
-                searchs = searchProvider.getSociosSeach(searchDto);
-              });
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Container(
-                            width: (_screenSize.width / 2),
-                            child: _fieldBuscar()),
-                        Container(
-                            width: (_screenSize.width / 2) - 50,
-                            child: ButtonTheme(
-                                child: RaisedButton(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0)),
-                              textColor: Colors.white,
-                              child: Text('Buscar'),
-                              onPressed: () {
-                                _search();
-                              },
-                            ))),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                            width: (_screenSize.width / 2) - 25,
-                            child: _dropEspecialidad()),
-                        Container(
-                            width: (_screenSize.width / 2) - 25,
-                            child: _dropCiudadBySocio())
-                      ],
-                    ),
-                  )
-                ],
-              ),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        drawer: DrawerWidget(
+          key: UniqueKey(),
+        ),
+        appBar: AppBar(
+          title: Text('Rotary'),
+          actions: <Widget>[
+            // IconButton(
+            //   icon: Icon(
+            //     Icons.menu,
+            //     color: Colors.white,
+            //   ),
+            //   onPressed: () {
+            //     _scaffoldKey.currentState.openDrawer();
+            //   },
+            // ),
+            IconButton(
+              icon: Icon(Icons.sync),
+              onPressed: () {
+                setState(() {
+                  buscar.clear();
+                  categoria = 'Todas las Categorias';
+                  ciudad = 'Todas las Ciudades';
+                  searchDto = new SearchDto();
+                  if (categoria == 'Todas las Categorias') {
+                    searchDto.categoria = null;
+                  } else {
+                    searchDto.categoria = categoria;
+                  }
+                  if (ciudad == 'Todas las Ciudades') {
+                    searchDto.ciudad = null;
+                  } else {
+                    searchDto.ciudad = ciudad;
+                  }
+                  searchDto.descripcion = buscar.text;
+                  searchs = searchProvider.getSociosSeach(searchDto);
+                });
+              },
             ),
-            SizedBox(
-              height: 5,
-            ),
-            Divider(),
-            SizedBox(
-              height: 5,
-            ),
-            Expanded(child: _getSocios())
           ],
+        ),
+        body: Container(
+          child: Column(
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                              width: (_screenSize.width / 2),
+                              child: _fieldBuscar()),
+                          Container(
+                              width: (_screenSize.width / 2) - 50,
+                              child: ButtonTheme(
+                                  child: RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0)),
+                                textColor: Colors.white,
+                                child: Text('Buscar'),
+                                onPressed: () {
+                                  _search();
+                                },
+                              ))),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                              width: (_screenSize.width / 2) - 25,
+                              child: _dropCategoria()),
+                          Container(
+                              width: (_screenSize.width / 2) - 25,
+                              child: _dropCiudadBySocio())
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Divider(),
+              SizedBox(
+                height: 5,
+              ),
+              Expanded(child: _getSocios())
+            ],
+          ),
         ),
       ),
     );
@@ -214,7 +229,7 @@ class _HomePageState extends State<HomePage> {
             value: ciudad,
             hint: new Text('Ciudad'),
             searchHint: new Text(
-              'Seleccione Una',
+              'Seleccione Una Ciudad',
               style: new TextStyle(fontSize: 20),
             ),
             onChanged: (value) {
@@ -226,11 +241,11 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  Widget _dropEspecialidad() {
+  Widget _dropCategoria() {
     return FutureBuilder(
-        future: especialidadProvider.getEspecialidades(),
+        future: categoriaProvider.findCategoriasBySocios(),
         builder:
-            (BuildContext context, AsyncSnapshot<List<Especialidad>> snapshot) {
+            (BuildContext context, AsyncSnapshot<List<Categoria>> snapshot) {
           if (!snapshot.hasData) {
             return Container();
           }
@@ -238,7 +253,7 @@ class _HomePageState extends State<HomePage> {
           return new SearchableDropdown(
             isExpanded: true,
             items: snapshot.data.map((x) {
-              final nme = x.nombreEspecialidad.trim();
+              final nme = x.nombreCategoria.trim();
               return new DropdownMenuItem(
                 child: Container(
                   width: 155.0,
@@ -247,18 +262,18 @@ class _HomePageState extends State<HomePage> {
                     overflow: TextOverflow.visible,
                   ),
                 ),
-                value: x.nombreEspecialidad.trim(),
+                value: x.nombreCategoria.trim(),
               );
             }).toList(),
-            value: especialidad,
-            hint: new Text('Especialidad'),
+            value: categoria,
+            hint: new Text('Categoria'),
             searchHint: new Text(
-              'Seleccione Una',
+              'Seleccione Una Categoria',
               style: new TextStyle(fontSize: 20),
             ),
             onChanged: (value) {
               setState(() {
-                especialidad = value;
+                categoria = value;
               });
             },
           );
@@ -292,7 +307,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _cardSocios(BuildContext context, Search search) {
-    print(search.celular);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -414,8 +428,11 @@ class _HomePageState extends State<HomePage> {
                                   Container(
                                     margin: EdgeInsets.all(5),
                                     child: FadeInImage(
-                                      image: AssetImage(
-                                          'assets/img/rotary-logo.png'),
+                                      image: search.imagen == null
+                                          ? AssetImage(
+                                              'assets/img/rotary-logo.png')
+                                          : NetworkImage(
+                                              'http://${Constants.URL_API}/file/uploads/img/${search.imagen}'),
                                       placeholder:
                                           AssetImage('assets/img/loading.gif'),
                                       fadeInDuration:
@@ -454,7 +471,6 @@ class _HomePageState extends State<HomePage> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       onPressed: () {
-                                        print(search.celular);
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -485,20 +501,39 @@ class _HomePageState extends State<HomePage> {
 
   _search() {
     searchDto = new SearchDto();
-    if (especialidad == 'Todas') {
-      searchDto.especialidad = null;
+    if (categoria == 'Todas las Categorias') {
+      searchDto.categoria = null;
     } else {
-      searchDto.especialidad = especialidad;
+      searchDto.categoria = categoria;
     }
-    if (ciudad == 'Todas') {
+    if (ciudad == 'Todas las Ciudades') {
       searchDto.ciudad = null;
     } else {
       searchDto.ciudad = ciudad;
     }
     searchDto.descripcion = buscar.text;
-
+    _mostrarAlert(context);
     setState(() {
       searchs = searchProvider.getSociosSeach(searchDto);
+      Timer(Duration(seconds: 1), () => Navigator.of(context).pop('dialog'));
     });
+  }
+
+  void _mostrarAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              title: Text('Por favor Espere...'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Center(child: CircularProgressIndicator()),
+                ],
+              ));
+        });
   }
 }
