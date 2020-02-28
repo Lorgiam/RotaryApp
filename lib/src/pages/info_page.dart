@@ -142,8 +142,11 @@ class _InfoPageState extends State<InfoPage> {
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
         title: Text(
-          '${search.especialidadEntity.nombreEspecialidad}',
-          style: TextStyle(color: Colors.white, fontSize: 16.0),
+          search.informacionComercialEntity.descripcionServicio.length > 0
+              ? '${search.informacionComercialEntity.descripcionServicio}'
+              : 'Sin Definir',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.start,
         ),
         background: FadeInImage(
           image: search.imagen == null

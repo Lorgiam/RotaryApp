@@ -11,6 +11,7 @@ import 'package:rotary/src/models/ciudad.dart';
 import 'package:rotary/src/models/club.dart';
 import 'package:rotary/src/models/especialidad.dart';
 import 'package:rotary/src/models/informacion_comercial.dart';
+import 'package:rotary/src/models/search.dart';
 import 'package:rotary/src/models/socio.dart';
 import 'package:rotary/src/models/usuario.dart';
 import 'package:rotary/src/providers/http/categoria_provider.dart';
@@ -23,10 +24,16 @@ import 'package:rotary/src/providers/http/informacion_comercial.dart';
 import 'package:rotary/src/providers/http/socio_provider.dart';
 import 'package:rotary/src/providers/http/upload_provider.dart';
 import 'package:rotary/src/providers/http/usuario_provider.dart';
+import 'package:rotary/src/utils/constants.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 class RegisterPage extends StatefulWidget {
-  RegisterPage({Key key}) : super(key: key);
+  String opc;
+  String per;
+  Search search;
+  String act;
+  RegisterPage({Key key, this.opc, this.search, this.per, this.act})
+      : super(key: key);
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -60,7 +67,9 @@ class _RegisterPageState extends State<RegisterPage> {
   String club;
   String especialidad;
   String ciudad;
-  List<dynamic> categorias = new List();
+  String _character;
+  List categorias = new List();
+  List categoriasTmp = new List();
   // Variable de Ancho de la Pantalla
   var _screenSize;
   // Variable File para Visualizacion de la Imagen Tomada o Seleccionada
@@ -73,23 +82,64 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
+  // Perfil
+  String opc;
+
   @override
   void initState() {
+    super.initState();
+    categorias = [];
     ciudadFuture = ciudadProvider.getCiudades();
     clubFuture = clubProvider.getClubes();
     especialidadFuture = especialidadProvider.getEspecialidadesL();
     categoriaFuture = categoriaProvider.getCategorias();
+    _character = 'SOC';
     // TODO: implement initState
-    super.initState();
+    if (widget.search != null) {
+      nombreCompleto.text = widget.search.nombreCompleto;
+      numeroCedula.text = widget.search.numeroCedula;
+      correoElectronico.text = widget.search.correoElectronico;
+      numeroCelular.text = widget.search.celular;
+      nombreComercial.text =
+          widget.search.informacionComercialEntity.nombreComercial;
+      direccionComercial.text =
+          widget.search.informacionComercialEntity.direccionComercial;
+      paginacorreo.text = widget.search.informacionComercialEntity.paginaEmail;
+      telefono.text = widget.search.informacionComercialEntity.telefono;
+      descripcion.text =
+          widget.search.informacionComercialEntity.descripcionServicio;
+      _date.text =
+          formatDate(widget.search.fechaNacimiento, [dd, '-', mm, '-', yyyy]);
+      _fecha =
+          formatDate(widget.search.fechaNacimiento, [yyyy, '-', mm, '-', dd]);
+      ciudad = widget.search.ciudadEntity.nombreCiudad;
+      club = widget.search.clubEntity.nombreClub;
+      _mostrarFoto(widget.search.imagen);
+      (() async {
+        await categoriaSocioProvider
+            .findCategoriasBySocios(widget.search.id)
+            .then((res) {
+          res.forEach((x) {
+            setState(() {
+              categorias.add(x.idCategoria);
+              categoriasTmp.add(x.idCategoria);
+            });
+          });
+        });
+      })();
+    }
+    if (widget.opc == '3') {
+      widget.per = _character;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     _screenSize = MediaQuery.of(context).size;
-
+    print(categorias);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registro'),
+        title: widget.act == null ? Text('Registro') : Text('Editar'),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.camera_alt),
@@ -112,7 +162,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 margin: EdgeInsets.only(top: 15),
                 width: 150,
                 height: 150,
-                child: _mostrarFoto(),
+                child: _mostrarFoto(widget.search?.imagen),
               ),
               SizedBox(
                 height: 20,
@@ -121,6 +171,47 @@ class _RegisterPageState extends State<RegisterPage> {
                 'Información Basica',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+              widget.opc == '3'
+                  ? Container(
+                      margin: EdgeInsets.only(left: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                              width: 120,
+                              child: ListTile(
+                                  title: const Text('Administrador'),
+                                  leading: Radio(
+                                    value: 'ADM',
+                                    groupValue: _character,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _character = value;
+                                      });
+                                    },
+                                  )),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              width: 100,
+                              child: ListTile(
+                                  title: const Text('Socio'),
+                                  leading: Radio(
+                                    value: 'SOC',
+                                    groupValue: _character,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _character = value;
+                                      });
+                                    },
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ))
+                  : SizedBox(),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 width: _screenSize.width * 0.9,
@@ -179,7 +270,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 width: _screenSize.width * 0.9,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Expanded(
                       child: Container(
@@ -189,9 +280,22 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     Expanded(
                       child: Container(
+                        alignment: Alignment.bottomCenter,
                         margin: EdgeInsets.symmetric(horizontal: 5),
-                        child: _dropEspecialidad(),
+                        child: _dropCiudades(),
                       ),
+                    ),
+                  ],
+                ),
+              ),
+              _dropCategoria(),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: descripcionServicio(),
                     ),
                   ],
                 ),
@@ -237,13 +341,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: <Widget>[
                     Expanded(
                       child: Container(
-                        alignment: Alignment.bottomCenter,
-                        margin: EdgeInsets.symmetric(horizontal: 5),
-                        child: _dropCiudades(),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         child: _fieldNumeroComercial(),
                       ),
@@ -262,18 +359,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
               ),
-              _dropCategoria(),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                width: _screenSize.width * 0.9,
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: descripcionServicio(),
-                    ),
-                  ],
-                ),
-              ),
               Container(
                   width: (_screenSize.width / 2) - 50,
                   child: ButtonTheme(
@@ -281,7 +366,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0)),
                     textColor: Colors.white,
-                    child: Text('Registrarse'),
+                    child:
+                        widget.act == null ? Text('Registro') : Text('Editar'),
                     onPressed: () {
                       _registro();
                     },
@@ -299,7 +385,10 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: nombreCompleto,
       keyboardType: TextInputType.text,
       textCapitalization: TextCapitalization.sentences,
-      decoration: InputDecoration(labelText: 'Nombre Completo'),
+      decoration: InputDecoration(
+          labelText: 'Nombre Completo',
+          counterText: 'Obligatorio *',
+          counterStyle: TextStyle(color: Colors.red)),
       onSaved: (value) => nombreCompleto.text = value,
     );
   }
@@ -322,7 +411,10 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: descripcion,
       keyboardType: TextInputType.text,
       textCapitalization: TextCapitalization.sentences,
-      decoration: InputDecoration(labelText: 'Descripcion del Servicio'),
+      decoration: InputDecoration(
+          labelText: 'Profesión/Especialidad',
+          counterText: '',
+          counterStyle: TextStyle(color: Colors.red)),
       onSaved: (value) => descripcion.text = value,
     );
   }
@@ -350,6 +442,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _dropCategoria() {
+    print('---- ' + categorias.toString());
     return FutureBuilder(
         future: categoriaFuture,
         builder:
@@ -375,6 +468,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Form(
                     key: _formKey,
                     child: MultiSelect(
+                        initialValue: categorias,
                         autovalidate: false,
                         titleText: 'Categoria',
                         validator: (value) {
@@ -388,8 +482,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         valueField: 'idCategoria',
                         filterable: true,
                         required: true,
-                        value: null,
+                        value: categorias,
                         onSaved: (value) {
+                          print(value);
                           setState(() {
                             categorias = value;
                           });
@@ -405,10 +500,14 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _fieldNumeroCedula() {
     return TextFormField(
       enabled: true,
+      readOnly: widget.act == null ? false : true,
       controller: numeroCedula,
       keyboardType: TextInputType.number,
       textCapitalization: TextCapitalization.sentences,
-      decoration: InputDecoration(labelText: 'Numero de Cedula'),
+      decoration: InputDecoration(
+          labelText: 'Numero de Cedula',
+          counterText: 'Obligatorio *',
+          counterStyle: TextStyle(color: Colors.red)),
       onSaved: (value) => numeroCedula.text = value,
     );
   }
@@ -437,9 +536,9 @@ class _RegisterPageState extends State<RegisterPage> {
               );
             }).toList(),
             value: ciudad,
-            hint: new Text('Ciudad'),
+            hint: new Text('Ciudad *'),
             searchHint: new Text(
-              'Seleccione Una',
+              'Seleccione Una Ciudad',
               style: new TextStyle(fontSize: 20),
             ),
             onChanged: (value) {
@@ -514,9 +613,9 @@ class _RegisterPageState extends State<RegisterPage> {
               );
             }).toList(),
             value: club,
-            hint: new Text('Club'),
+            hint: new Text('Club *'),
             searchHint: new Text(
-              'Seleccione Una',
+              'Seleccione Un Club',
               style: new TextStyle(fontSize: 20),
             ),
             onChanged: (value) {
@@ -531,10 +630,14 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _fieldNumeroCelular() {
     return TextFormField(
       enabled: true,
+      readOnly: widget.act == null ? false : true,
       controller: numeroCelular,
       keyboardType: TextInputType.number,
       textCapitalization: TextCapitalization.sentences,
-      decoration: InputDecoration(labelText: 'Numero de Celular'),
+      decoration: InputDecoration(
+          labelText: 'Numero de Celular',
+          counterText: 'Obligatorio *',
+          counterStyle: TextStyle(color: Colors.red)),
       onSaved: (value) => numeroCelular.text = value,
     );
   }
@@ -545,7 +648,10 @@ class _RegisterPageState extends State<RegisterPage> {
       controller: correoElectronico,
       keyboardType: TextInputType.emailAddress,
       textCapitalization: TextCapitalization.sentences,
-      decoration: InputDecoration(labelText: 'Email'),
+      decoration: InputDecoration(
+          labelText: 'Email',
+          counterText: 'Obligatorio *',
+          counterStyle: TextStyle(color: Colors.red)),
       onSaved: (value) => correoElectronico.text = value,
     );
   }
@@ -565,7 +671,10 @@ class _RegisterPageState extends State<RegisterPage> {
     return TextField(
       enableInteractiveSelection: false,
       controller: _date,
-      decoration: InputDecoration(labelText: 'Fec. Nacimiento'),
+      decoration: InputDecoration(
+          labelText: 'Fec. Nacimiento',
+          counterText: 'Obligatorio *',
+          counterStyle: TextStyle(color: Colors.red)),
       onTap: () {
         //Linea para quitar el foco del elemento
         FocusScope.of(context).requestFocus(new FocusNode());
@@ -590,16 +699,65 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  _mostrarFoto() {
+  _mostrarFoto([String imgedt]) {
     //TODO: tengo que hacer este metodo para el perfil
-    if (foto == null) {
-      return Image(
-          image: AssetImage('assets/img/no-image.png'),
+    if (foto == null && imgedt == null) {
+      return GestureDetector(
+        onTap: () {
+          _seleccionarImagen(context);
+        },
+        child: Image(
+            image: AssetImage('assets/img/no-image.png'),
+            width: 200,
+            height: 200,
+            fit: BoxFit.cover),
+      );
+    } else if (foto == null && imgedt != null) {
+      return GestureDetector(
+        onTap: () {
+          _seleccionarImagen(context);
+        },
+        child: FadeInImage(
           width: 200,
           height: 200,
-          fit: BoxFit.cover);
-    } else {
-      return Image.file(foto, width: 200, height: 200, fit: BoxFit.cover);
+          fit: BoxFit.cover,
+          placeholder: AssetImage('assets/img/loading.gif'),
+          image: NetworkImage(
+              'http://${Constants.URL_API}/file/uploads/img/$imgedt'),
+        ),
+      );
+      // return GestureDetector(
+      //     onTap: () {
+      //       _seleccionarImagen(context);
+      //     },
+      //     child: Image.network(imgedt,
+      //         width: 200, height: 200, fit: BoxFit.cover));
+    } else if (foto != null && imgedt == null) {
+      return GestureDetector(
+          onTap: () {
+            _seleccionarImagen(context);
+          },
+          child: FadeInImage(
+            width: 200,
+            height: 200,
+            fit: BoxFit.cover,
+            placeholder: AssetImage('assets/img/loading.gif'),
+            image: Image.file(foto, width: 200, height: 200, fit: BoxFit.cover)
+                .image,
+          ));
+    } else if (foto != null && imgedt != null) {
+      return GestureDetector(
+          onTap: () {
+            _seleccionarImagen(context);
+          },
+          child: FadeInImage(
+            width: 200,
+            height: 200,
+            fit: BoxFit.cover,
+            placeholder: AssetImage('assets/img/loading.gif'),
+            image: Image.file(foto, width: 200, height: 200, fit: BoxFit.cover)
+                .image,
+          ));
     }
   }
 
@@ -621,92 +779,252 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _registro() async {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-    }
-    _mostrarAlert(context);
-    Usuario usu = new Usuario();
-    Socio soc = new Socio();
-    InformacionComercial infoco = new InformacionComercial();
-
-    usu.nombreUsuario = numeroCelular.text;
-    usu.estado = 0;
-    usu.contrasenia = numeroCedula.text
-        .substring(numeroCedula.text.length - 4, numeroCedula.text.length);
-    usu.tipo = 'SOC';
-    await usuarioProvider.save(usu).then((usu) async {
-      if (usu != null) {
-        // TODO: Hacer Switch para Preguntar si desea registrar informacion Comercial, por ahora se hace como si todos fueran a registrarla
-        infoco.nombreComercial = nombreComercial.text;
-        infoco.direccionComercial = direccionComercial.text;
-        await ciudadFuture.then((ci) {
-          infoco.ciudad = ci.firstWhere((el) {
-            return el.nombreCiudad == ciudad;
-          }).idCiudad;
-        });
-        infoco.telefono = telefono.text;
-        infoco.paginaEmail = paginacorreo.text;
-        infoco.descripcionServicio = descripcion.text;
-        await informacionComercialProvider.save(infoco).then((info) async {
-          if (info != null) {
-            soc.numeroCedula = numeroCedula.text;
-            soc.fechaNacimiento = DateTime.parse(_fecha);
-            soc.nombreCompleto = nombreCompleto.text;
-            soc.correoElectronico = correoElectronico.text;
-            soc.celular = numeroCelular.text;
-            soc.informacionComercial = info.idInformacion;
-            soc.usuario = usu.idUsuario;
-            await clubFuture.then((cl) {
-              soc.club = cl.firstWhere((el) {
-                return el.nombreClub == club;
-              }).idClub;
-            });
-            await especialidadFuture.then((es) {
-              soc.especialidad = es.firstWhere((el) {
-                return el.nombreEspecialidad == especialidad;
-              }).idEspecialidad;
-            });
-
-            await socioProvider.save(soc).then((sc) async {
-              if (foto != null) {
-                await uploadProvider.save(foto, sc.idSocio);
-              }
-              if (categorias.length > 0) {
-                categorias.forEach((x) async {
-                  CategoriaSocioDto cts = new CategoriaSocioDto();
-                  cts.idCategoria = x;
-                  cts.idSocio = sc.idSocio;
-                  await categoriaSocioProvider.save(cts);
-                });
-              }
-              if (sc != null) {
-                EmailDto email = new EmailDto();
-                email.email = correoElectronico.text;
-                await emailProvider.save(email).then((res) {
-                  Navigator.of(context, rootNavigator: true).pop('dialog');
-                  _mostrarAlertInfo(context,
-                      'Registro Exitoso, su cuenta sera activada por un Administrador, usted sera notificado por correo');
-                });
-              } else {
-                // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
-              }
-            });
-          } else {
-            // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
-          }
-        });
-      } else {
-        // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+    if (widget.opc == '4') {
+      if (_formKey.currentState.validate()) {
+        _formKey.currentState.save();
       }
-    }).catchError((err) {
-      // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
-    });
+      _mostrarAlert(context);
+      Usuario usu = new Usuario();
+      Socio soc = new Socio();
+      InformacionComercial infoco = new InformacionComercial();
+      usu.idUsuario = widget.search.usuarioEntity.idUsuario;
+      usu.tipo = widget.search.usuarioEntity.tipo;
+      usu.estado = widget.search.usuarioEntity.estado;
+      usu.nombreUsuario = numeroCelular.text;
+      usu.contrasenia = numeroCedula.text
+          .substring(numeroCedula.text.length - 4, numeroCedula.text.length);
+      await usuarioProvider
+          .update(usu, widget.search.usuarioEntity.idUsuario)
+          .then((usu) async {
+        if (usu != null) {
+          // TODO: Hacer Switch para Preguntar si desea registrar informacion Comercial, por ahora se hace como si todos fueran a registrarla
+          infoco.idInformacion =
+              widget.search.informacionComercialEntity.idInformacion;
+          infoco.nombreComercial = nombreComercial.text;
+          infoco.direccionComercial = direccionComercial.text;
+          if (ciudad.isNotEmpty) {
+            await ciudadFuture.then((ci) {
+              infoco.ciudad = ci.firstWhere((el) {
+                return el.nombreCiudad == ciudad;
+              }).idCiudad;
+            });
+          }
+          infoco.telefono = telefono.text;
+          infoco.paginaEmail = paginacorreo.text;
+          infoco.descripcionServicio = descripcion.text;
+          await informacionComercialProvider
+              .update(infoco, infoco.idInformacion)
+              .then((info) async {
+            if (info != null) {
+              soc.idSocio = widget.search.id;
+              soc.numeroCedula = numeroCedula.text;
+              soc.fechaNacimiento = DateTime.parse(_fecha);
+              soc.nombreCompleto = nombreCompleto.text;
+              soc.correoElectronico = correoElectronico.text;
+              soc.celular = numeroCelular.text;
+              soc.informacionComercial = info.idInformacion;
+              soc.usuario = usu.idUsuario;
+              soc.imagen = widget.search.imagen;
+              await clubFuture.then((cl) {
+                soc.club = cl.firstWhere((el) {
+                  return el.nombreClub == club;
+                }).idClub;
+              });
+              // await especialidadFuture.then((es) {
+              //   soc.especialidad = es.firstWhere((el) {
+              //     return el.nombreEspecialidad == especialidad;
+              //   }).idEspecialidad;
+              // });
+
+              await socioProvider.update(soc, soc.idSocio).then((sc) async {
+                if (foto != null) {
+                  await uploadProvider.save(foto, sc.idSocio);
+                }
+                if (categorias.length > 0) {
+                  categoriasTmp.forEach((el) async {
+                    final cat = categorias.firstWhere((e) {
+                      return e == el;
+                    }, orElse: () {
+                      return null;
+                    });
+                    if (cat == null) {
+                      CategoriaSocioDto cts = new CategoriaSocioDto();
+                      cts.idCategoria = el;
+                      cts.idSocio = sc.idSocio;
+                      await categoriaSocioProvider.delete(sc.idSocio, el);
+                    }
+                  });
+                  categorias.forEach((el) async {
+                    final cat = categoriasTmp.firstWhere((e) {
+                      return e == el;
+                    }, orElse: () {
+                      return null;
+                    });
+                    if (cat == null) {
+                      CategoriaSocioDto cts = new CategoriaSocioDto();
+                      cts.idCategoria = el;
+                      cts.idSocio = sc.idSocio;
+                      await categoriaSocioProvider.save(cts);
+                    }
+                  });
+
+                  // categorias.forEach((x) async {
+                  //   CategoriaSocioDto cts = new CategoriaSocioDto();
+                  //   cts.idCategoria = x;
+                  //   cts.idSocio = sc.idSocio;
+                  //   await categoriaSocioProvider.save(cts);
+                  // });
+                }
+                if (sc != null) {
+                  EmailDto email = new EmailDto();
+                  email.email = correoElectronico.text;
+                  if (widget.opc == '1') {
+                    await emailProvider.save(email).then((res) {
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
+                      _mostrarAlertInfo(context,
+                          'Registro Exitoso, su cuenta sera activada por un Administrador, usted sera notificado por correo');
+                    });
+                  } else if (widget.opc == '2') {
+                    await emailProvider.saveSoc(email).then((res) {
+                      print(res);
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
+                      _mostrarAlertInfo(context, 'Registro Exitoso');
+                    });
+                  } else if (widget.opc == '3') {
+                    await emailProvider.saveAdm(email).then((res) {
+                      print(res);
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
+                      _mostrarAlertInfo(context, 'Registro Exitoso');
+                    });
+                  } else {
+                    _mostrarAlertInfo(context, 'Editado Exitoso');
+                  }
+                } else {
+                  // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+                }
+              });
+            } else {
+              // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+            }
+          });
+        } else {
+          // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+        }
+      }).catchError((err) {
+        // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+      });
+    } else {
+      if (_formKey.currentState.validate()) {
+        _formKey.currentState.save();
+      }
+      _mostrarAlert(context);
+      Usuario usu = new Usuario();
+      Socio soc = new Socio();
+      InformacionComercial infoco = new InformacionComercial();
+
+      usu.nombreUsuario = numeroCelular.text;
+      if (widget.opc == '1') {
+        usu.estado = 0;
+      } else {
+        usu.estado = 1;
+      }
+      usu.contrasenia = numeroCedula.text
+          .substring(numeroCedula.text.length - 4, numeroCedula.text.length);
+      if (widget.per == 'SOC') {
+        usu.tipo = 'SOC';
+      } else {
+        usu.tipo = 'ADM';
+      }
+      await usuarioProvider.save(usu).then((usu) async {
+        if (usu != null) {
+          // TODO: Hacer Switch para Preguntar si desea registrar informacion Comercial, por ahora se hace como si todos fueran a registrarla
+          infoco.nombreComercial = nombreComercial.text;
+          infoco.direccionComercial = direccionComercial.text;
+          if (ciudad.isNotEmpty) {
+            await ciudadFuture.then((ci) {
+              infoco.ciudad = ci.firstWhere((el) {
+                return el.nombreCiudad == ciudad;
+              }).idCiudad;
+            });
+          }
+          infoco.telefono = telefono.text;
+          infoco.paginaEmail = paginacorreo.text;
+          infoco.descripcionServicio = descripcion.text;
+          await informacionComercialProvider.save(infoco).then((info) async {
+            if (info != null) {
+              soc.numeroCedula = numeroCedula.text;
+              soc.fechaNacimiento = DateTime.parse(_fecha);
+              soc.nombreCompleto = nombreCompleto.text;
+              soc.correoElectronico = correoElectronico.text;
+              soc.celular = numeroCelular.text;
+              soc.informacionComercial = info.idInformacion;
+              soc.usuario = usu.idUsuario;
+              await clubFuture.then((cl) {
+                soc.club = cl.firstWhere((el) {
+                  return el.nombreClub == club;
+                }).idClub;
+              });
+              // await especialidadFuture.then((es) {
+              //   soc.especialidad = es.firstWhere((el) {
+              //     return el.nombreEspecialidad == especialidad;
+              //   }).idEspecialidad;
+              // });
+
+              await socioProvider.save(soc).then((sc) async {
+                if (foto != null) {
+                  await uploadProvider.save(foto, sc.idSocio);
+                }
+                if (categorias.length > 0) {
+                  categorias.forEach((x) async {
+                    CategoriaSocioDto cts = new CategoriaSocioDto();
+                    cts.idCategoria = x;
+                    cts.idSocio = sc.idSocio;
+                    await categoriaSocioProvider.save(cts);
+                  });
+                }
+                if (sc != null) {
+                  EmailDto email = new EmailDto();
+                  email.email = correoElectronico.text;
+                  if (widget.opc == '1') {
+                    await emailProvider.save(email).then((res) {
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
+                      _mostrarAlertInfo(context,
+                          'Registro Exitoso, su cuenta sera activada por un Administrador, usted sera notificado por correo');
+                    });
+                  } else if (widget.opc == '2') {
+                    await emailProvider.saveSoc(email).then((res) {
+                      print(res);
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
+                      _mostrarAlertInfo(context, 'Registro Exitoso');
+                    });
+                  } else if (widget.opc == '3') {
+                    await emailProvider.saveAdm(email).then((res) {
+                      print(res);
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
+                      _mostrarAlertInfo(context, 'Registro Exitoso');
+                    });
+                  }
+                } else {
+                  // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+                }
+              });
+            } else {
+              // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+            }
+          });
+        } else {
+          // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+        }
+      }).catchError((err) {
+        // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
+      });
+    }
   }
 
   void _mostrarAlertInfo(BuildContext context, String texto) {
     showDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
@@ -729,7 +1047,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void _mostrarAlert(BuildContext context) {
     showDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
               shape: RoundedRectangleBorder(
@@ -744,3 +1062,5 @@ class _RegisterPageState extends State<RegisterPage> {
         });
   }
 }
+
+enum SingingCharacter { lafayette, jefferson }

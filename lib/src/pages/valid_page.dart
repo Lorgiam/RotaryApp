@@ -290,7 +290,7 @@ class _ValidPageState extends State<ValidPage> {
                 child: Text('Aceptar'),
                 onPressed: () async {
                   if (_opcionSeleccionada != 'Seleccione') {
-                    Navigator.of(context).pop();
+                    _mostrarAlert(context);
                     await usuarioProvider
                         .updateEstado(id, int.parse(_opcionSeleccionada))
                         .then((res) async {
@@ -302,9 +302,12 @@ class _ValidPageState extends State<ValidPage> {
                             setState(() {
                               socios = searchProvider.getSociosSeachInactivos();
                             });
+                            Navigator.of(context)..pop()..pop();
                           }
                         });
                       }
+                    }).catchError((err) {
+                      Navigator.of(context, rootNavigator: true).pop('dialog');
                     });
                   }
                 },
@@ -320,6 +323,24 @@ class _ValidPageState extends State<ValidPage> {
         });
   }
 
+  void _mostrarAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              title: Text('Por favor Espere...'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Center(child: CircularProgressIndicator()),
+                ],
+              ));
+        });
+  }
+
   List<DropdownMenuItem<String>> getOpcionesDropdown() {
     List<DropdownMenuItem<String>> lista = new List();
 
@@ -327,6 +348,10 @@ class _ValidPageState extends State<ValidPage> {
       ..add(DropdownMenuItem(
         child: Text('Seleccione'),
         value: '-1',
+      ))
+      ..add(DropdownMenuItem(
+        child: Text('Inactivo'),
+        value: '0',
       ))
       ..add(DropdownMenuItem(
         child: Text('Activo'),

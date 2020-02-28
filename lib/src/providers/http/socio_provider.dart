@@ -39,7 +39,8 @@ class SocioProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/socio/findBy/$id', headers: mapHeaders)
+        .get('http://${Constants.URL_API}/socio/findBy/$id',
+            headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
         final data = json.decode(jsonData.body);
@@ -89,6 +90,31 @@ class SocioProvider {
     };
     return await http
         .post('http://${Constants.URL_API}/socio/save',
+            headers: mapHeaders, body: json.encode(scs.toJson()))
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        final data = json.decode(jsonData.body);
+        if (data.isNotEmpty) {
+          final Socio sc = Socio.fromJson(data);
+          return sc;
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
+  Future<Socio> update(Socio scs, int idSocio) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+    return await http
+        .put('http://${Constants.URL_API}/socio/update/$idSocio',
             headers: mapHeaders, body: json.encode(scs.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

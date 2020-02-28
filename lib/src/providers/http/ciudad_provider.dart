@@ -59,4 +59,31 @@ class CiudadProvider {
       print(err);
     });
   }
+
+  Future<Ciudad> getCiudadById(int id) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+
+    return await http
+        .get('http://${Constants.URL_API}/ciudad/findBy/$id',
+            headers: mapHeaders)
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        final data = json.decode(jsonData.body);
+        if (data.isNotEmpty) {
+          String l = utf8.decode(jsonData.bodyBytes);
+          final Ciudad sc = Ciudad.fromJson(json.decode(l));
+          return sc;
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
 }

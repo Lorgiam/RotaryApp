@@ -89,7 +89,7 @@ class _RegisterAdminPageState extends State<RegisterAdminPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Reg. Administradores'),
+        title: Text('Reg. Adminis'),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.camera_alt),
@@ -237,13 +237,6 @@ class _RegisterAdminPageState extends State<RegisterAdminPage> {
                   children: <Widget>[
                     Expanded(
                       child: Container(
-                        alignment: Alignment.bottomCenter,
-                        margin: EdgeInsets.symmetric(horizontal: 5),
-                        child: _dropCiudades(),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         child: _fieldNumeroComercial(),
                       ),
@@ -270,6 +263,21 @@ class _RegisterAdminPageState extends State<RegisterAdminPage> {
                   children: <Widget>[
                     Expanded(
                       child: descripcionServicio(),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.bottomCenter,
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        child: _dropCiudades(),
+                      ),
                     ),
                   ],
                 ),
@@ -633,6 +641,7 @@ class _RegisterAdminPageState extends State<RegisterAdminPage> {
     usu.estado = 1;
     usu.contrasenia = numeroCedula.text
         .substring(numeroCedula.text.length - 4, numeroCedula.text.length);
+    usu.tipo = 'SOC';
     usu.tipo = 'ADM';
     await usuarioProvider.save(usu).then((usu) async {
       if (usu != null) {
@@ -682,10 +691,17 @@ class _RegisterAdminPageState extends State<RegisterAdminPage> {
               if (sc != null) {
                 EmailDto email = new EmailDto();
                 email.email = correoElectronico.text;
+                email.id = sc.idSocio;
                 await emailProvider.saveAdm(email).then((res) {
+                  print(res);
                   Navigator.of(context, rootNavigator: true).pop('dialog');
                   _mostrarAlertInfo(context, 'Registro Exitoso');
                 });
+                // await emailProvider.saveSoc(email).then((res) {
+                //   print(res);
+                //   Navigator.of(context, rootNavigator: true).pop('dialog');
+                //   _mostrarAlertInfo(context, 'Registro Exitoso');
+                // });
               } else {
                 // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
               }
@@ -705,7 +721,7 @@ class _RegisterAdminPageState extends State<RegisterAdminPage> {
   void _mostrarAlertInfo(BuildContext context, String texto) {
     showDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
@@ -728,7 +744,7 @@ class _RegisterAdminPageState extends State<RegisterAdminPage> {
   void _mostrarAlert(BuildContext context) {
     showDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
               shape: RoundedRectangleBorder(

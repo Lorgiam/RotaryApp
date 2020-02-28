@@ -3,6 +3,7 @@ import 'package:rotary/bloc/data_bloc.dart';
 import 'package:rotary/bloc/login_bloc.dart';
 import 'package:rotary/bloc/provider.dart';
 import 'package:rotary/src/dto/auth_dto.dart';
+import 'package:rotary/src/pages/register_page.dart';
 import 'package:rotary/src/providers/db/db.provider.dart';
 import 'package:rotary/src/providers/http/auth_provider.dart';
 
@@ -16,8 +17,8 @@ class _LoginPageState extends State<LoginPage> {
   Size size;
   @override
   void initState() {
-    super.initState();
     _validUser();
+    super.initState();
   }
 
   @override
@@ -67,9 +68,12 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           FlatButton(
-            child: Text('Crear cuenta'),
-            onPressed: () => Navigator.pushNamed(context, 'register'),
-          ),
+              child: Text('Crear cuenta'),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegisterPage(opc: '1', per: 'SOC'),
+                  ))),
           SizedBox(height: 100.0)
         ],
       ),
@@ -255,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
   void _mostrarAlertInfo(BuildContext context, String texto) {
     showDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
@@ -278,7 +282,7 @@ class _LoginPageState extends State<LoginPage> {
   void _mostrarAlert(BuildContext context) {
     showDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
               shape: RoundedRectangleBorder(

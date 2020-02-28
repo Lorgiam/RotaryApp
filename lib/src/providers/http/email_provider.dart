@@ -64,4 +64,42 @@ class EmailProvider {
       print(err);
     });
   }
+
+  Future<int> sendChangePerfil(EmailDto emailDto) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+    return await http
+        .post('http://${Constants.URL_API}/mail/sendChangePerfil',
+            headers: mapHeaders, body: json.encode(emailDto.toJson()))
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
+  Future<int> sendChangeEst(EmailDto emailDto) async {
+    final Map<String, String> mapHeaders = {
+      'Content-type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    };
+    return await http
+        .post('http://${Constants.URL_API}/mail/sendChangeEst',
+            headers: mapHeaders, body: json.encode(emailDto.toJson()))
+        .then((jsonData) {
+      if (jsonData.statusCode == 200) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
 }

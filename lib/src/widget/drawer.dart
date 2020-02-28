@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:rotary/bloc/data_bloc.dart';
 import 'package:rotary/src/models/storage.dart';
+import 'package:rotary/src/pages/register_page.dart';
 import 'package:rotary/src/providers/db/db.provider.dart';
 // import 'package:flutter/services.dart';
 
@@ -68,6 +69,20 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         ..add(
           new ListTile(
             leading: Icon(Icons.person),
+            title: Text('Registrar Socios'),
+            onTap: () {
+              // change app state...
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegisterPage(opc: '2', per: 'SOC'),
+                  )); // close the drawer
+            },
+          ),
+        )
+        ..add(
+          new ListTile(
+            leading: Icon(Icons.person),
             title: Text('Activar Socios'),
             onTap: () {
               // change app state...
@@ -96,27 +111,48 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         );
     } else if (storage.tip == 'SA') {
       ls
+        // ..add(
+        //   new ListTile(
+        //     leading: Icon(Icons.person),
+        //     title: Text('Activar Socios'),
+        //     onTap: () {
+        //       // change app state...
+        //       Navigator.popAndPushNamed(context, 'valid'); // close the drawer
+        //     },
+        //   ),
+        // )
         ..add(
           new ListTile(
             leading: Icon(Icons.person),
-            title: Text('Activar Socios'),
+            title: Text('Gestionar Usuarios'),
             onTap: () {
               // change app state...
-              Navigator.popAndPushNamed(context, 'valid'); // close the drawer
+              Navigator.popAndPushNamed(context, 'gestion'); // close the drawer
             },
           ),
         )
-        ..add(
-          new ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Registrar Administradores'),
-            onTap: () {
-              // change app state...
-              Navigator.popAndPushNamed(
-                  context, 'register_admin'); // close the drawer
-            },
-          ),
-        )
+        // ..add(
+        //   new ListTile(
+        //     leading: Icon(Icons.person),
+        //     title: Text('Registrar Administradores'),
+        //     onTap: () {
+        //       // change app state...
+        //       Navigator.popAndPushNamed(
+        //           context, 'register_admin'); // close the drawer
+        //     },
+        //   ),
+        // )
+        // ..add(
+        //   new ListTile(
+        //     leading: Icon(Icons.person),
+        //     title: Text('Registrar Socios'),
+        //     onTap: () {
+        //       // change app state...
+        //       Navigator.popAndPushNamed(
+        //           context, 'register_admin'); // close the drawer
+        //     },
+        //   ),
+        // )
         ..add(
           new ListTile(
             leading: Icon(Icons.close),
@@ -164,7 +200,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     exit(0);
                   } else {
                     await DBProvider.db.deleteUsuario(storage.nme).then((e) {
-                      Navigator.pop(context);
                       Navigator.pushReplacementNamed(context, '/');
                     });
                   }

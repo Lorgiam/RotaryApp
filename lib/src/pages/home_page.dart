@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:rotary/bloc/data_bloc.dart';
+import 'package:rotary/bloc/search_bloc.dart';
 import 'package:rotary/src/dto/search_dto.dart';
 import 'package:rotary/src/models/categoria.dart';
 import 'package:rotary/src/models/ciudad.dart';
-import 'package:rotary/src/models/especialidad.dart';
+
 import 'package:rotary/src/models/search.dart';
 import 'package:rotary/src/models/storage.dart';
 import 'package:rotary/src/pages/info_page.dart';
@@ -13,7 +14,9 @@ import 'package:rotary/src/providers/http/categoria_provider.dart';
 
 import 'package:rotary/src/providers/http/ciudad_provider.dart';
 import 'package:rotary/src/providers/http/especialidad_provider.dart';
+import 'package:rotary/src/providers/http/informacion_comercial.dart';
 import 'package:rotary/src/providers/http/search_provider.dart';
+import 'package:rotary/src/providers/http/socio_provider.dart';
 import 'package:rotary/src/utils/constants.dart';
 
 import 'package:rotary/src/widget/drawer.dart';
@@ -37,38 +40,61 @@ class _HomePageState extends State<HomePage> {
 
   // Providers
   EspecialidadProvider especialidadProvider = new EspecialidadProvider();
+  SocioProvider socioProvider = new SocioProvider();
   CiudadProvider ciudadProvider = new CiudadProvider();
   SearchProvider searchProvider = new SearchProvider();
+  InformacionComercialProvider informacionComercialProvider =
+      new InformacionComercialProvider();
   CategoriaProvider categoriaProvider = new CategoriaProvider();
-
-  //Future
-  Future<List<Search>> searchs;
 
   //Clases
   SearchDto searchDto;
   Storage storage;
 
+  // Blocs
+  SearchBloc searchBloc = new SearchBloc();
+
   DataBloc dataBloc = new DataBloc();
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+
+    super.didChangeDependencies();
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     storage = Storage.fromJson(dataBloc.data);
     categoria = 'Todas las Categorias';
-    ciudad = 'Todas las Ciudades';
-    searchDto = new SearchDto();
-    if (categoria == 'Todas las Categorias') {
-      searchDto.categoria = null;
-    } else {
-      searchDto.categoria = categoria;
-    }
-    if (ciudad == 'Todas las Ciudades') {
-      searchDto.ciudad = null;
-    } else {
-      searchDto.ciudad = ciudad;
-    }
-    searchDto.descripcion = buscar.text;
-    searchs = searchProvider.getSociosSeach(searchDto);
+    (() async {
+      await socioProvider.getSocioById(storage.usu).then((res) async {
+        await informacionComercialProvider
+            .getInfoCoById(res.informacionComercial)
+            .then((info) async {
+          await ciudadProvider.getCiudadById(info.ciudad).then((ciu) {
+            ciudad = ciu.nombreCiudad;
+            searchDto = new SearchDto();
+            if (categoria == 'Todas las Categorias') {
+              searchDto.categoria = null;
+            } else {
+              searchDto.categoria = categoria;
+            }
+            if (ciudad == 'Todas las Ciudades') {
+              searchDto.ciudad = null;
+            } else {
+              searchDto.ciudad = ciudad;
+            }
+            setState(() {
+              searchDto.descripcion = buscar.text;
+              searchBloc.searchData(searchDto, 2);
+            });
+          });
+        });
+      });
+    })();
+
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
@@ -104,6 +130,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               icon: Icon(Icons.sync),
               onPressed: () {
+                _mostrarAlert(context);
                 setState(() {
                   buscar.clear();
                   categoria = 'Todas las Categorias';
@@ -120,7 +147,10 @@ class _HomePageState extends State<HomePage> {
                     searchDto.ciudad = ciudad;
                   }
                   searchDto.descripcion = buscar.text;
-                  searchs = searchProvider.getSociosSeach(searchDto);
+                  searchBloc.searchData(searchDto, 2);
+                });
+                Future.delayed(const Duration(seconds: 3), () {
+                  Navigator.of(context, rootNavigator: true).pop('dialog');
                 });
               },
             ),
@@ -281,8 +311,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _getSocios() {
-    return FutureBuilder(
-      future: searchs,
+    return StreamBuilder(
+      stream: searchBloc.dataOpc2Stream,
       builder: (BuildContext context, AsyncSnapshot<List<Search>> snapshot) {
         if (snapshot.hasData) {
           return _listCardsSocios(snapshot.data);
@@ -366,7 +396,13 @@ class _HomePageState extends State<HomePage> {
                                           height: 2,
                                         ),
                                         Text(
-                                          '${search.especialidadEntity.nombreEspecialidad}',
+                                          search
+                                                      .informacionComercialEntity
+                                                      .descripcionServicio
+                                                      .length >
+                                                  0
+                                              ? '${search.informacionComercialEntity.descripcionServicio}'
+                                              : 'Sin Definir',
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
@@ -514,7 +550,7 @@ class _HomePageState extends State<HomePage> {
     searchDto.descripcion = buscar.text;
     _mostrarAlert(context);
     setState(() {
-      searchs = searchProvider.getSociosSeach(searchDto);
+      searchBloc.searchData(searchDto, 2);
       Timer(Duration(seconds: 1), () => Navigator.of(context).pop('dialog'));
     });
   }

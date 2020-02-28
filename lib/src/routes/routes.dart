@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rotary/src/pages/Info_page.dart';
+import 'package:rotary/src/pages/gestionar_usuarios_pages.dart';
 import 'package:rotary/src/pages/home_page.dart';
 import 'package:rotary/src/pages/login_page.dart';
 import 'package:rotary/src/pages/register_admin.dart';
@@ -14,5 +15,6 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     'register': (BuildContext context) => RegisterPage(),
     'valid': (BuildContext context) => ValidPage(),
     'register_admin': (BuildContext context) => RegisterAdminPage(),
+    'gestion': (BuildContext context) => GestionarUsuariosPage(),
   };
 }
