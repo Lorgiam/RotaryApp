@@ -181,13 +181,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Container(
                               width: 120,
                               child: ListTile(
-                                  title: const Text('Administrador'),
+                                  title: const Text('Adminis.'),
                                   leading: Radio(
                                     value: 'ADM',
                                     groupValue: _character,
                                     onChanged: (value) {
                                       setState(() {
                                         _character = value;
+                                        widget.per = _character;
                                       });
                                     },
                                   )),
@@ -204,6 +205,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     onChanged: (value) {
                                       setState(() {
                                         _character = value;
+                                        widget.per = _character;
                                       });
                                     },
                                   )),
@@ -280,7 +282,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     Expanded(
                       child: Container(
-                        alignment: Alignment.bottomCenter,
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         child: _dropCiudades(),
                       ),
@@ -505,7 +506,7 @@ class _RegisterPageState extends State<RegisterPage> {
       keyboardType: TextInputType.number,
       textCapitalization: TextCapitalization.sentences,
       decoration: InputDecoration(
-          labelText: 'Numero de Cedula',
+          labelText: 'Cedula',
           counterText: 'Obligatorio *',
           counterStyle: TextStyle(color: Colors.red)),
       onSaved: (value) => numeroCedula.text = value,
@@ -878,6 +879,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 if (sc != null) {
                   EmailDto email = new EmailDto();
                   email.email = correoElectronico.text;
+                  email.id = sc.idSocio;
                   if (widget.opc == '1') {
                     await emailProvider.save(email).then((res) {
                       Navigator.of(context, rootNavigator: true).pop('dialog');
@@ -897,7 +899,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       _mostrarAlertInfo(context, 'Registro Exitoso');
                     });
                   } else {
-                    _mostrarAlertInfo(context, 'Editado Exitoso');
+                    Navigator.of(context, rootNavigator: true).pop('dialog');
+                    _mostrarAlertInfo(context, 'Operación Exitosa');
                   }
                 } else {
                   // TODO: Mostrar Mensaje de Intentarlo Mas Tarde
@@ -984,6 +987,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 }
                 if (sc != null) {
                   EmailDto email = new EmailDto();
+                  email.id = sc.idSocio;
                   email.email = correoElectronico.text;
                   if (widget.opc == '1') {
                     await emailProvider.save(email).then((res) {
@@ -998,11 +1002,21 @@ class _RegisterPageState extends State<RegisterPage> {
                       _mostrarAlertInfo(context, 'Registro Exitoso');
                     });
                   } else if (widget.opc == '3') {
-                    await emailProvider.saveAdm(email).then((res) {
-                      print(res);
-                      Navigator.of(context, rootNavigator: true).pop('dialog');
-                      _mostrarAlertInfo(context, 'Registro Exitoso');
-                    });
+                    if (widget.per == 'SOC') {
+                      await emailProvider.saveSoc(email).then((res) {
+                        print(res);
+                        Navigator.of(context, rootNavigator: true)
+                            .pop('dialog');
+                        _mostrarAlertInfo(context, 'Registro Exitoso');
+                      });
+                    } else {
+                      await emailProvider.saveAdm(email).then((res) {
+                        print(res);
+                        Navigator.of(context, rootNavigator: true)
+                            .pop('dialog');
+                        _mostrarAlertInfo(context, 'Registro Exitoso');
+                      });
+                    }
                   }
                 } else {
                   // TODO: Mostrar Mensaje de Intentarlo Mas Tarde

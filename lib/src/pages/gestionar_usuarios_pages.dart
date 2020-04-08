@@ -105,7 +105,31 @@ class _GestionarUsuariosPageState extends State<GestionarUsuariosPage> {
           ),
           IconButton(
             icon: Icon(Icons.sync),
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                perfil = '-1';
+                estado = '-1';
+                estadoDialog = '-1';
+                perfilDialog = '-1';
+                if (perfil == '-1') {
+                  searchDto.perfil = null;
+                } else {
+                  searchDto.perfil = perfil;
+                }
+                if (estado == '-1') {
+                  searchDto.estado = null;
+                } else {
+                  searchDto.estado = int.parse(estado);
+                }
+                searchDto.descripcion = buscar.text;
+                _mostrarAlert(context);
+                setState(() {
+                  searchBloc.searchData(searchDto, 1);
+                  Timer(Duration(seconds: 1),
+                      () => Navigator.of(context).pop('dialog'));
+                });
+              });
+            },
           ),
         ],
       ),

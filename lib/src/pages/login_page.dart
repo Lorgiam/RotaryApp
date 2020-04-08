@@ -247,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 100,
               ),
               SizedBox(height: 10.0, width: double.infinity),
-              Text('Rotary International',
+              Text('Directorio Rotary D4281',
                   style: TextStyle(color: Colors.white, fontSize: 25.0))
             ],
           ),

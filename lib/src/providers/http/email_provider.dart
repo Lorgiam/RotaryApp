@@ -39,6 +39,7 @@ class EmailProvider {
       if (jsonData.statusCode == 200) {
         return 1;
       } else {
+        print(jsonData.body);
         return 0;
       }
     }).catchError((err) {

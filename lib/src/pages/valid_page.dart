@@ -121,7 +121,13 @@ class _ValidPageState extends State<ValidPage> {
                                           height: 2,
                                         ),
                                         Text(
-                                          '${socios.especialidadEntity.nombreEspecialidad}',
+                                          socios
+                                                      .informacionComercialEntity
+                                                      .descripcionServicio
+                                                      .length >
+                                                  0
+                                              ? '${socios.informacionComercialEntity.descripcionServicio}'
+                                              : 'Sin Definir',
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),

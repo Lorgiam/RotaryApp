@@ -670,9 +670,33 @@ class _InfoPageState extends State<InfoPage> {
                                           SizedBox(
                                             height: 10,
                                           ),
-                                          Text(
-                                            '${search.informacionComercialEntity.paginaEmail}',
-                                            style: TextStyle(fontSize: 16),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              if (search
+                                                  .informacionComercialEntity
+                                                  .paginaEmail
+                                                  .contains('@')) {
+                                                final url =
+                                                    'mailto:${search.informacionComercialEntity.paginaEmail}';
+                                                if (await canLaunch(url)) {
+                                                  await launch(url);
+                                                } else {
+                                                  throw 'Could not launch $url';
+                                                }
+                                              } else {
+                                                final url =
+                                                    'https://maps.google.com/?q=${search.informacionComercialEntity.direccionComercial} ${search.ciudadEntity.nombreCiudad}';
+                                                if (await canLaunch(url)) {
+                                                  await launch(url);
+                                                } else {
+                                                  throw 'Could not launch $url';
+                                                }
+                                              }
+                                            },
+                                            child: Text(
+                                              '${search.informacionComercialEntity.paginaEmail}',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
                                           ),
                                           Text(
                                             'Pagina/Correo',
