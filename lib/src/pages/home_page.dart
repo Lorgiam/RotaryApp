@@ -18,14 +18,14 @@ import 'package:rotary/src/providers/http/informacion_comercial.dart';
 import 'package:rotary/src/providers/http/search_provider.dart';
 import 'package:rotary/src/providers/http/socio_provider.dart';
 import 'package:rotary/src/utils/constants.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+//import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:rotary/src/widget/drawer.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
-const kHtml = """
+// const kHtml = """
 
-<iframe src="http://www.qualitycolombia.com/home/" width="560" height="315"></iframe>
-""";
+// <iframe src="http://www.qualitycolombia.com/home/" width="560" height="315"></iframe>
+// """;
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
