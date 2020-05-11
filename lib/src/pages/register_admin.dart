@@ -642,7 +642,7 @@ class _RegisterAdminPageState extends State<RegisterAdminPage> {
     usu.contrasenia = numeroCedula.text
         .substring(numeroCedula.text.length - 4, numeroCedula.text.length);
     usu.tipo = 'SOC';
-    usu.tipo = 'ADM';
+    usu.tipo = 'SA';
     await usuarioProvider.save(usu).then((usu) async {
       if (usu != null) {
         // TODO: Hacer Switch para Preguntar si desea registrar informacion Comercial, por ahora se hace como si todos fueran a registrarla

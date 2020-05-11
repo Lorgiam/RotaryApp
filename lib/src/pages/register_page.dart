@@ -4,8 +4,10 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multiselect/flutter_multiselect.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rotary/bloc/search_bloc.dart';
 import 'package:rotary/src/dto/categoria_socio_dto.dart';
 import 'package:rotary/src/dto/email_dto.dart';
+import 'package:rotary/src/dto/search_dto.dart';
 import 'package:rotary/src/models/categoria.dart';
 import 'package:rotary/src/models/ciudad.dart';
 import 'package:rotary/src/models/club.dart';
@@ -52,6 +54,8 @@ class _RegisterPageState extends State<RegisterPage> {
   UploadProvider uploadProvider = new UploadProvider();
   CategoriaProvider categoriaProvider = new CategoriaProvider();
   CategoriaSocioProvider categoriaSocioProvider = new CategoriaSocioProvider();
+  // Blocs
+  SearchBloc searchBloc = new SearchBloc();
   // Input
   TextEditingController nombreCompleto = new TextEditingController();
   TextEditingController numeroCedula = new TextEditingController();
@@ -68,6 +72,11 @@ class _RegisterPageState extends State<RegisterPage> {
   String especialidad;
   String ciudad;
   String _character;
+  String perfil;
+  String perfilDialog;
+  String estado;
+  String estadoDialog;
+
   List categorias = new List();
   List categoriasTmp = new List();
   // Variable de Ancho de la Pantalla
@@ -183,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               child: ListTile(
                                   title: const Text('Adminis.'),
                                   leading: Radio(
-                                    value: 'ADM',
+                                    value: 'SA',
                                     groupValue: _character,
                                     onChanged: (value) {
                                       setState(() {
@@ -280,12 +289,6 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: _dropClubes(),
                       ),
                     ),
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 5),
-                        child: _dropCiudades(),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -310,6 +313,21 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               SizedBox(
                 height: 10,
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                width: _screenSize.width * 0.9,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 5),
+                        child: _dropCiudades(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -723,8 +741,8 @@ class _RegisterPageState extends State<RegisterPage> {
           height: 200,
           fit: BoxFit.cover,
           placeholder: AssetImage('assets/img/loading.gif'),
-          image: NetworkImage(
-              'http://${Constants.URL_API}/file/uploads/img/$imgedt'),
+          image:
+              NetworkImage('http://${Constants.URL_API}/downloadFile/$imgedt'),
         ),
       );
       // return GestureDetector(
@@ -877,6 +895,22 @@ class _RegisterPageState extends State<RegisterPage> {
                   // });
                 }
                 if (sc != null) {
+                  SearchDto searchDto = new SearchDto();
+                  perfil = '-1';
+                  estado = '-1';
+                  estadoDialog = '-1';
+                  perfilDialog = '-1';
+                  if (perfil == '-1') {
+                    searchDto.perfil = null;
+                  } else {
+                    searchDto.perfil = perfil;
+                  }
+                  if (estado == '-1') {
+                    searchDto.estado = null;
+                  } else {
+                    searchDto.estado = int.parse(estado);
+                  }
+                  searchDto.descripcion = null;
                   EmailDto email = new EmailDto();
                   email.email = correoElectronico.text;
                   email.id = sc.idSocio;
@@ -888,17 +922,19 @@ class _RegisterPageState extends State<RegisterPage> {
                     });
                   } else if (widget.opc == '2') {
                     await emailProvider.saveSoc(email).then((res) {
+                      searchBloc.searchData(searchDto, 1);
                       print(res);
                       Navigator.of(context, rootNavigator: true).pop('dialog');
                       _mostrarAlertInfo(context, 'Registro Exitoso');
                     });
                   } else if (widget.opc == '3') {
                     await emailProvider.saveAdm(email).then((res) {
-                      print(res);
+                      searchBloc.searchData(searchDto, 1);
                       Navigator.of(context, rootNavigator: true).pop('dialog');
                       _mostrarAlertInfo(context, 'Registro Exitoso');
                     });
                   } else {
+                    searchBloc.searchData(searchDto, 1);
                     Navigator.of(context, rootNavigator: true).pop('dialog');
                     _mostrarAlertInfo(context, 'Operación Exitosa');
                   }
@@ -936,7 +972,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (widget.per == 'SOC') {
         usu.tipo = 'SOC';
       } else {
-        usu.tipo = 'ADM';
+        usu.tipo = 'SA';
       }
       await usuarioProvider.save(usu).then((usu) async {
         if (usu != null) {

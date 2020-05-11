@@ -1,4 +1,4 @@
-package com.example.rotary
+package com.quality.rotary
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

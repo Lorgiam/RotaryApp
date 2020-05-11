@@ -64,51 +64,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             },
           ),
         );
-    } else if (storage.tip == 'ADM') {
-      ls
-        ..add(
-          new ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Registrar Socios'),
-            onTap: () {
-              // change app state...
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => RegisterPage(opc: '2', per: 'SOC'),
-                  )); // close the drawer
-            },
-          ),
-        )
-        ..add(
-          new ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Activar Socios'),
-            onTap: () {
-              // change app state...
-              Navigator.popAndPushNamed(context, 'valid'); // close the drawer
-            },
-          ),
-        )
-        ..add(
-          new ListTile(
-            leading: Icon(Icons.close),
-            title: Text('Cerrar Sesion'),
-            onTap: () async {
-              _mostrarAlert(context, 2, 'Desea Cerrar Sesión');
-            },
-          ),
-        )
-        ..add(
-          new ListTile(
-            // leading: Icon(Icons.closeap),
-            title: Text('Salir'),
-            onTap: () {
-              // change app state...
-              _mostrarAlert(context, 1, 'Desea Salir de la Aplicación');
-            },
-          ),
-        );
     } else if (storage.tip == 'SA') {
       ls
         // ..add(

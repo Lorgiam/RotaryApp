@@ -152,7 +152,7 @@ class _InfoPageState extends State<InfoPage> {
           image: search.imagen == null
               ? AssetImage('assets/img/rotary-logo.png')
               : NetworkImage(
-                  'http://${Constants.URL_API}/file/uploads/img/${search.imagen}'),
+                  'http://${Constants.URL_API}/downloadFile/${search.imagen}'),
           placeholder: AssetImage('assets/img/loading.gif'),
           fadeInDuration: Duration(milliseconds: 150),
           fit: BoxFit.cover,
@@ -841,7 +841,7 @@ class _InfoPageState extends State<InfoPage> {
       await socioProvider.getSocioById((id)).then((el) {
         setState(() {
           widget.search.imagen = el.imagen;
-        });
+        }); 
       });
     }
   }

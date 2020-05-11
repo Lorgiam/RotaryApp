@@ -73,7 +73,7 @@ class _GestionarUsuariosPageState extends State<GestionarUsuariosPage> {
     } else {
       searchDto.estado = int.parse(estado);
     }
-    searchDto.descripcion = buscar.text;
+    searchDto.descripcion = buscar.text;  
     searchBloc.searchData(searchDto, 1);
 
     _scrollController.addListener(() {
@@ -285,7 +285,7 @@ class _GestionarUsuariosPageState extends State<GestionarUsuariosPage> {
       ))
       ..add(DropdownMenuItem(
         child: Text('Administrador'),
-        value: 'ADM',
+        value: 'SA',
       ));
     if (perfil != null) {
       lista.removeWhere((el) => el.value == perfil);
@@ -307,7 +307,7 @@ class _GestionarUsuariosPageState extends State<GestionarUsuariosPage> {
       ))
       ..add(DropdownMenuItem(
         child: Text('Administrador'),
-        value: 'ADM',
+        value: 'SA',
       ));
 
     if (perfil != null) {
@@ -524,7 +524,7 @@ class _GestionarUsuariosPageState extends State<GestionarUsuariosPage> {
                                           ? AssetImage(
                                               'assets/img/rotary-logo.png')
                                           : NetworkImage(
-                                              'http://${Constants.URL_API}/file/uploads/img/${search.imagen}'),
+                                              'http://${Constants.URL_API}/downloadFile/${search.imagen}'),
                                       placeholder:
                                           AssetImage('assets/img/loading.gif'),
                                       fadeInDuration:
@@ -790,7 +790,7 @@ class _GestionarUsuariosPageState extends State<GestionarUsuariosPage> {
                       if (res != null) {
                         EmailDto emailDto = new EmailDto();
                         emailDto.id = soc;
-                        if (perfilDialog == 'ADM') {
+                        if (perfilDialog == 'SA') {
                           emailDto.per = 'Administrador';
                         } else if (perfilDialog == 'SOC') {
                           emailDto.per = 'Socio';
