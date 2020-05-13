@@ -13,7 +13,7 @@ class UsuarioProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/usuario/save',
+        .post('https://${Constants.URL_API}/usuario/save',
             headers: mapHeaders, body: json.encode(usu.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -38,7 +38,7 @@ class UsuarioProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .put('http://${Constants.URL_API}/usuario/update/$idUsuario',
+        .put('https://${Constants.URL_API}/usuario/update/$idUsuario',
             headers: mapHeaders, body: json.encode(usu.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -64,7 +64,7 @@ class UsuarioProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/usuario/updateEstado/$id/$estado',
+        .get('https://${Constants.URL_API}/usuario/updateEstado/$id/$estado',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -90,7 +90,7 @@ class UsuarioProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/usuario/updatePerfil/$id/$perfil',
+        .get('https://${Constants.URL_API}/usuario/updatePerfil/$id/$perfil',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

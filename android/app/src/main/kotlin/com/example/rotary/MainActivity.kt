@@ -1,4 +1,4 @@
-package com.quality.rotary
+package com.qualitycolombia.rotarydircol
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

@@ -483,7 +483,7 @@ class _HomePageState extends State<HomePage> {
                                           ? AssetImage(
                                               'assets/img/rotary-logo.png')
                                           : NetworkImage(
-                                              'http://${Constants.URL_API}/downloadFile/${search.imagen}'),
+                                              'https://${Constants.URL_API}/downloadFile/${search.imagen}'),
                                       placeholder:
                                           AssetImage('assets/img/loading.gif'),
                                       fadeInDuration:

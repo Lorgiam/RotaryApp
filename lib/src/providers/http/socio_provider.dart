@@ -15,7 +15,7 @@ class SocioProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/socio/findAll', headers: mapHeaders)
+        .get('https://${Constants.URL_API}/socio/findAll', headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
         Iterable l = json.decode(jsonData.body);
@@ -39,7 +39,7 @@ class SocioProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/socio/findBy/$id',
+        .get('https://${Constants.URL_API}/socio/findBy/$id',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -65,7 +65,7 @@ class SocioProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/socio/findSociosByEstadoInactivo',
+        .get('https://${Constants.URL_API}/socio/findSociosByEstadoInactivo',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -89,7 +89,7 @@ class SocioProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/socio/save',
+        .post('https://${Constants.URL_API}/socio/save',
             headers: mapHeaders, body: json.encode(scs.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -114,7 +114,7 @@ class SocioProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .put('http://${Constants.URL_API}/socio/update/$idSocio',
+        .put('https://${Constants.URL_API}/socio/update/$idSocio',
             headers: mapHeaders, body: json.encode(scs.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

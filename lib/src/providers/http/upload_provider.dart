@@ -13,7 +13,7 @@ class UploadProvider {
 
   Future<int> save(File image, int id) async {
     final mimeType = mime(image.path).split('/');
-    final url = Uri.parse('http://${Constants.URL_API}/uploadFile/$id');
+    final url = Uri.parse('https://${Constants.URL_API}/uploadFile/$id');
     final imageUploadRequest = http.MultipartRequest('POST', url);
     final file = await http.MultipartFile.fromPath('file', image.path,
         contentType: MediaType(mimeType[0], mimeType[1]));

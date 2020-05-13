@@ -13,7 +13,7 @@ class EspecialidadProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/especialidad/findAll',
+        .get('https://${Constants.URL_API}/especialidad/findAll',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -39,7 +39,7 @@ class EspecialidadProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/especialidad/findEspecialidadBySocio',
+        .get('https://${Constants.URL_API}/especialidad/findEspecialidadBySocio',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

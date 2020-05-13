@@ -13,7 +13,7 @@ class ClubProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/club/findAll', headers: mapHeaders)
+        .get('https://${Constants.URL_API}/club/findAll', headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
         String l = utf8.decode(jsonData.bodyBytes);

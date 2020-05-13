@@ -742,7 +742,7 @@ class _RegisterPageState extends State<RegisterPage> {
           fit: BoxFit.cover,
           placeholder: AssetImage('assets/img/loading.gif'),
           image:
-              NetworkImage('http://${Constants.URL_API}/downloadFile/$imgedt'),
+              NetworkImage('https://${Constants.URL_API}/downloadFile/$imgedt'),
         ),
       );
       // return GestureDetector(

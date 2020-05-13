@@ -15,7 +15,7 @@ class CategoriaSocioProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/categoriaSocio/save',
+        .post('https://${Constants.URL_API}/categoriaSocio/save',
             headers: mapHeaders, body: json.encode(cts.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -41,7 +41,7 @@ class CategoriaSocioProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/categoriaSocio/findBySocio/$idSocio',
+        .get('https://${Constants.URL_API}/categoriaSocio/findBySocio/$idSocio',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -68,7 +68,7 @@ class CategoriaSocioProvider {
 
     return await http
         .delete(
-            'http://${Constants.URL_API}/categoriaSocio/delete/$idSocio/$idCategoria',
+            'https://${Constants.URL_API}/categoriaSocio/delete/$idSocio/$idCategoria',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

@@ -193,7 +193,7 @@ class _ValidPageState extends State<ValidPage> {
                                           ? AssetImage(
                                               'assets/img/rotary-logo.png')
                                           : NetworkImage(
-                                              'http://${Constants.URL_API}/downloadFile/${socios.imagen}'),
+                                              'https://${Constants.URL_API}/downloadFile/${socios.imagen}'),
                                       placeholder:
                                           AssetImage('assets/img/loading.gif'),
                                       fadeInDuration:

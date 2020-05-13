@@ -14,8 +14,9 @@ class AuthProvider {
       'Content-type': 'application/json',
       'Access-Control-Allow-Origin': '*',
     };
+
     return await http
-        .post('http://${Constants.URL_API}/usuario/login',
+        .post('https://${Constants.URL_API}/usuario/login',
             headers: mapHeaders, body: json.encode(auth.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

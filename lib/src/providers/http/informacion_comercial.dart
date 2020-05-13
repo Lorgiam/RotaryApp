@@ -13,7 +13,7 @@ class InformacionComercialProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/informacionComercial/save',
+        .post('https://${Constants.URL_API}/informacionComercial/save',
             headers: mapHeaders, body: json.encode(infoco.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -40,7 +40,7 @@ class InformacionComercialProvider {
     };
     return await http
         .put(
-            'http://${Constants.URL_API}/informacionComercial/update/$idInfoPro ',
+            'https://${Constants.URL_API}/informacionComercial/update/$idInfoPro ',
             headers: mapHeaders,
             body: json.encode(infoco.toJson()))
         .then((jsonData) {
@@ -67,7 +67,7 @@ class InformacionComercialProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/informacionComercial/findBy/$id',
+        .get('https://${Constants.URL_API}/informacionComercial/findBy/$id',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

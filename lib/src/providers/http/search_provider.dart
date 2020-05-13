@@ -15,7 +15,7 @@ class SearchProvider {
     };
 
     return await http
-        .post('http://${Constants.URL_API}/search/findSearch',
+        .post('https://${Constants.URL_API}/search/findSearch',
             body: json.encode(searchDto.toJson()), headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -41,7 +41,7 @@ class SearchProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/search/findSearchInactivos',
+        .get('https://${Constants.URL_API}/search/findSearchInactivos',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -67,7 +67,7 @@ class SearchProvider {
     };
 
     return await http
-        .post('http://${Constants.URL_API}/search/findSearchUsuarios',
+        .post('https://${Constants.URL_API}/search/findSearchUsuarios',
             body: json.encode(searchDto.toJson()), headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

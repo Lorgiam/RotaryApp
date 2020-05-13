@@ -15,7 +15,7 @@ class CategoriaProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/categoria/findAll',
+        .get('https://${Constants.URL_API}/categoria/findAll',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -40,7 +40,7 @@ class CategoriaProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/categoria/findCategoriasBySocios',
+        .get('https://${Constants.URL_API}/categoria/findCategoriasBySocios',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

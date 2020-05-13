@@ -13,7 +13,7 @@ class CiudadProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/ciudad/findCiudadBySocio',
+        .get('https://${Constants.URL_API}/ciudad/findCiudadBySocio',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -42,7 +42,7 @@ class CiudadProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/ciudad/findAll', headers: mapHeaders)
+        .get('https://${Constants.URL_API}/ciudad/findAll', headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
         String l = utf8.decode(jsonData.bodyBytes);
@@ -67,7 +67,7 @@ class CiudadProvider {
     };
 
     return await http
-        .get('http://${Constants.URL_API}/ciudad/findBy/$id',
+        .get('https://${Constants.URL_API}/ciudad/findBy/$id',
             headers: mapHeaders)
         .then((jsonData) {
       if (jsonData.statusCode == 200) {

@@ -14,7 +14,7 @@ class EmailProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/mail/send',
+        .post('https://${Constants.URL_API}/mail/send',
             headers: mapHeaders, body: json.encode(emailDto.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -33,7 +33,7 @@ class EmailProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/mail/sendSoc',
+        .post('https://${Constants.URL_API}/mail/sendSoc',
             headers: mapHeaders, body: json.encode(emailDto.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -53,7 +53,7 @@ class EmailProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/mail/sendAdm',
+        .post('https://${Constants.URL_API}/mail/sendAdm',
             headers: mapHeaders, body: json.encode(emailDto.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -72,7 +72,7 @@ class EmailProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/mail/sendChangePerfil',
+        .post('https://${Constants.URL_API}/mail/sendChangePerfil',
             headers: mapHeaders, body: json.encode(emailDto.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
@@ -91,7 +91,7 @@ class EmailProvider {
       'Access-Control-Allow-Origin': '*',
     };
     return await http
-        .post('http://${Constants.URL_API}/mail/sendChangeEst',
+        .post('https://${Constants.URL_API}/mail/sendChangeEst',
             headers: mapHeaders, body: json.encode(emailDto.toJson()))
         .then((jsonData) {
       if (jsonData.statusCode == 200) {
